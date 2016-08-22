@@ -1,4 +1,5 @@
 #include "GodArmManager.h"
+#include "GodArm.h"
 
 GodArmManager::GodArmManager()
 {
@@ -8,11 +9,17 @@ GodArmManager::~GodArmManager()
 {
 }
 
-/*创建英雄*/
-GodArmManager* GodArmManager::createWithLevel(Vec2 pt, int level)
+/*创建神器*/
+GodArmManager* GodArmManager::createWithLevel(int level,
+	PlayerManager* playerManager,
+	MonsterManager*  monsterManager,
+	BossManager*  bossManager)
 {
 	GodArmManager* godArmMgr = new GodArmManager();
-	if (godArmMgr && godArmMgr->initWithLevel(pt, level))
+	if (godArmMgr && godArmMgr->initWithLevel(level,
+		playerManager,
+		monsterManager,
+		bossManager))
 	{
 		godArmMgr->autorelease();
 	}
@@ -25,7 +32,25 @@ GodArmManager* GodArmManager::createWithLevel(Vec2 pt, int level)
 }
 
 /*初始化*/
-bool GodArmManager::initWithLevel(Vec2 pt, int level)
+bool GodArmManager::initWithLevel(int level,
+	PlayerManager* playerManager,
+	MonsterManager*  monsterManager,
+	BossManager*  bossManager)
 {
+	m_PlayerManager = playerManager;
+	m_MonsterManager = monsterManager;
+	m_BossManager = bossManager;
+
 	return true;
+}
+
+void GodArmManager::runPower()
+{
+	auto godArm = GodArm::create(1);
+	godArm->setPosition(Vec2(0, 0));
+	//monster->setScale(0.5f);
+	this->addChild(godArm, 1);
+
+	int value = godArm->runPower();
+	m_PlayerManager->setHurtValue(value);
 }

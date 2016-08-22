@@ -11,6 +11,7 @@
 #include "PlayerManager.h"
 #include "MonsterManager.h"
 #include "BossManager.h"
+#include "GodArmManager.h"
 #include "Boss.h"
 
 USING_NS_CC;
@@ -99,6 +100,7 @@ private:
 	PlayerManager*       m_PlayerManager;     //玩家
 	MonsterManager*    m_MonsterManager;  // 怪物
 	BossManager*         m_BossManager;       //Boss
+	GodArmManager*    m_GodArmManager;     //玩家
 	TMXTiledMap*         m_Map;         //地图
 	Rect m_Rect;
 	Boss* m_Boss;                           //Boss

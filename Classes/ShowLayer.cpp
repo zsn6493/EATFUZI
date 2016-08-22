@@ -165,6 +165,11 @@ void ShowLayer::loadConfig(int level)
 		//m_boss->setOrigin(Vec2(bossPointX, bossPointY));
 		//m_boss->setPosition(Vec2(bossPointX, bossPointY));
 		//this->addChild(m_boss, 3);
+		m_GodArmManager = GodArmManager::createWithLevel(1, m_PlayerManager, m_MonsterManager, m_BossManager);
+		m_GodArmManager->setPosition(Vec2(0, 0));
+		m_Map->addChild(m_GodArmManager, 4);
+
+		m_GodArmManager->runPower();
 
 		this->schedule(schedule_selector(ShowLayer::Monsterlogic), 0.1f);
 		this->schedule(schedule_selector(ShowLayer::logic), 1 / 20.0f);

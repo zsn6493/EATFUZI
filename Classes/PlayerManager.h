@@ -71,6 +71,7 @@ public:
 
 	CC_SYNTHESIZE(bool, m_BigPower, BigPowerStatus);
 	CC_SYNTHESIZE(Vector<Player*>*, m_zombiePtr, zombiePtr);
+	CC_SYNTHESIZE(int, m_HurtValue, HurtValue);
 
 	void useBigPower(Vector<Monster*>* monsterList, int level);
 

@@ -15,6 +15,7 @@ PlayerManager::PlayerManager()
 	m_IsFighting = false;
 	m_Deadcount = 0;
 	m_BigPower = false;
+	m_HurtValue = 1;
 }
 
 PlayerManager::~PlayerManager()
@@ -264,6 +265,7 @@ int PlayerManager::killMonster(Vector<Monster*>* monsterList)
 			if (h < bz)
 			{
 				py->setmoveStatus(false);
+				ms->setAcceptBlood(CCRANDOM_0_1() * this->getHurtValue());
 			}
 			else
 			{

@@ -12,6 +12,7 @@ Monster::Monster(void)
 	scheduleUpdate();
 	m_startMoveAction = false;
 	m_startFightAciton = false;
+	m_acceptBlood = 1;
 }
 
 Monster::~Monster(void)

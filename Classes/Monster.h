@@ -47,7 +47,8 @@ public:
 	CC_SYNTHESIZE(Vec2, m_Orgin, Origin);
 	CC_SYNTHESIZE(bool, m_moveStatus, moveStatus);	//当前行动状态
 	CC_SYNTHESIZE(bool, m_startMoveAction, startMoveAction);	//当前行动状态。
-	CC_SYNTHESIZE(bool, m_startFightAciton, startFightAciton);	//当前行动状态。
+	CC_SYNTHESIZE(bool, m_startFightAciton, startFightAciton);	//当前战斗状态。
+	CC_SYNTHESIZE(int, m_acceptBlood, AcceptBlood);	//当前受伤值。
 
 	void updateCallBack(float dt);
 

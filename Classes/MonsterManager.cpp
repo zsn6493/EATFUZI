@@ -2,6 +2,8 @@
 #include "MonsterManager.h"
 #include "AnimoTool.h"
 #include "FlowWord.h"
+#include <string>
+using namespace std;
 
 #define NOTIFY cocos2d::NotificationCenter::getInstance()
 
@@ -350,25 +352,6 @@ int MonsterManager::killPlayer(Vector<Player*>* playerList)
 			{
 				ms->setmoveStatus(true);
 			}
-
-			/*
-			//碰撞检测需要重新考虑
-			Rect rect = py->boundingBox();
-			if (rect.containsPoint(ms->getPosition())
-			|| rect.containsPoint(Vec2(ms->getPosition().x - ms->getContentSize().width / 2, ms->getPosition().y - ms->getContentSize().height / 2 + py->getContentSize().height / 2)))
-			{
-			//py->hurtMe(1);
-			//FlowWord* fw = FlowWord::create();
-			//py->addChild(fw);
-			//fw->showWord("-1", Vec2(ms->getSprite()->getPosition().x, ms->getSprite()->getPosition().y + ms->getContentSize().height / 2));
-			//fw->gettextLab()->setColor(Color3B(255, 0, 0));
-			//py->getPhysicsBody()->setVelocity(Vect(-100, 0));
-			ms->setmoveStatus(false);
-			}
-			else
-			{
-			ms->setmoveStatus(true);
-			}*/
 		}
 	}
 
@@ -386,11 +369,6 @@ void MonsterManager::controlAction(float dt)
 			{
 				ms->setstartMoveAction(true);
 				ms->setstartFightAciton(false);
-				//ms->getSprite()->stopActionByTag(101);
-				//this->schedule(schedule_selector(Monster::updateCallBack), 0.05f);
-				//auto action = AnimoTool::newTypeOneRightMoveAnimotion();
-				//action->setTag(100);
-				//ms->getSprite()->runAction(action);
 			}
 		}
 		else
@@ -399,17 +377,15 @@ void MonsterManager::controlAction(float dt)
 			{
 				ms->setstartFightAciton(true);
 				ms->setstartMoveAction(false);
-				//ms->getSprite()->stopActionByTag(100);
-				//auto action = AnimoTool::newTypeOneAttactAnimotion();
-				//action->setTag(101);
-				//ms->getSprite()->runAction(action);
 			}
 
-			ms->hurtMe(1);
+			ms->hurtMe(ms->getAcceptBlood());
+
+			string boold = StringUtils::format("%d", ms->getAcceptBlood());
 			//py->hurtMe(1);
 			FlowWord* fw = FlowWord::create();
 			ms->addChild(fw);
-			fw->showWord("-12400", Vec2(ms->getSprite()->getPosition().x, ms->getSprite()->getPosition().y + ms->getContentSize().height / 2));
+			fw->showWord(boold.c_str(), Vec2(ms->getSprite()->getPosition().x, ms->getSprite()->getPosition().y + ms->getContentSize().height / 2));
 			fw->gettextLab()->setColor(Color3B(255, 0, 0));
 		}
 	}
