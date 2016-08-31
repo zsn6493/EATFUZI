@@ -152,7 +152,7 @@ Player* PlayerManager::getPlayer()
 
 void PlayerManager::useFZ(Vec2 pt, Vector<Monster* >* monsterList, Boss* boss, bool firePower)
 {
-	auto power = PlayerPower::createSp(Sprite::create("Arm4.png"));
+	auto power = PlayerPower::createSp(Sprite::create("Arm4.png"), CCRANDOM_0_1() * this->getHurtValue());
 	auto winSize = Director::getInstance()->getWinSize();
 
 	power->setFirePower(firePower);

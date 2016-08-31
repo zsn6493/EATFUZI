@@ -54,3 +54,14 @@ void GodArmManager::runPower()
 	int value = godArm->runPower();
 	m_PlayerManager->setHurtValue(value);
 }
+
+void GodArmManager::runPower1()
+{
+	auto godArm = GodArm::create(1);
+	godArm->setPosition(Vec2(0, 0));
+	//monster->setScale(0.5f);
+	this->addChild(godArm, 1);
+
+	int value = godArm->runPower();
+	m_PlayerManager->setHurtValue(value);
+}

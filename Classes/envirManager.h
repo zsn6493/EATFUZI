@@ -10,6 +10,9 @@
 #include "Player.h"
 #include "Monster.h"
 #include "PlayerPower.h"
+#include "PlayerManager.h"
+#include "MonsterManager.h"
+#include "BossManager.h"
 USING_NS_CC;
 
 class EnvirManager : public Node
@@ -25,10 +28,16 @@ public:
 	bool initWithLevel(Vec2 pt);
 
 	//创建create()
-	static EnvirManager* createWithLevel(Vec2 pt, int level);
+	static EnvirManager* createWithLevel(int level,
+		PlayerManager* playerManager,
+		MonsterManager*  monsterManager,
+		BossManager*  bossManager);
 
 	//初始化
-	bool initWithLevel(Vec2 pt, int level);
+	bool initWithLevel(int level,
+		PlayerManager* playerManager,
+		MonsterManager*  monsterManager,
+		BossManager*  bossManager);
 
 	CC_SYNTHESIZE(bool, m_BigPower, BigPowerStatus);
 	CC_SYNTHESIZE(Vector<Player*>*, m_zombiePtr, zombiePtr);

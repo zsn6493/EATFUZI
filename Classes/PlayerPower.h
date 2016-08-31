@@ -45,9 +45,9 @@ public:
 
 	bool m_visiable;                          //怪物的是否可利用
 
-	bool initWithFileSp(Sprite* sp);
+	bool initWithFileSp(Sprite* sp, int bloodValue);
 
-	static PlayerPower* createSp(Sprite* sprite);
+	static PlayerPower* createSp(Sprite* sprite, int bloodValue);
 
 	void updateCallBack(float dt);
 
@@ -60,6 +60,7 @@ public:
 	Boss* boss;
 
 	CC_SYNTHESIZE(bool, m_FirePower, FirePower);
+	CC_SYNTHESIZE(int, m_Bload, Bload);
 
 	int killBoss(Boss* boss);
 

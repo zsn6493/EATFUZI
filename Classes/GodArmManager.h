@@ -41,6 +41,7 @@ public:
 		BossManager*  bossManager);
 
 	void runPower();
+	void runPower1();
 
 	CC_SYNTHESIZE(bool, m_BigPower, BigPowerStatus);
 	CC_SYNTHESIZE(Vector<Player*>*, m_zombiePtr, zombiePtr);

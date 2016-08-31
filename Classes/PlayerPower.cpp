@@ -3,6 +3,8 @@
 #include "PartiscEx.h"
 #include "FlowWord.h"
 #include "Boss.h"
+#include <string>
+
 USING_NS_CC;
 
 PlayerPower::PlayerPower(void)
@@ -11,6 +13,7 @@ PlayerPower::PlayerPower(void)
 	m_visiable = false;
 	m_boom = NULL;
 	m_FirePower = false;
+	m_Bload = 1;
 }
 
 PlayerPower::~PlayerPower(void)
@@ -30,10 +33,10 @@ PlayerPower* PlayerPower::create(Node* node)
 	return NULL;
 }
 
-PlayerPower* PlayerPower::createSp(Sprite* sprite)
+PlayerPower* PlayerPower::createSp(Sprite* sprite, int bloodValue)
 {
 	PlayerPower *playerPower = new PlayerPower();
-	if (playerPower && playerPower->initWithFileSp(sprite))
+	if (playerPower && playerPower->initWithFileSp(sprite, bloodValue))
 	{
 		playerPower->autorelease();
 		return playerPower;
@@ -43,9 +46,10 @@ PlayerPower* PlayerPower::createSp(Sprite* sprite)
 	return NULL;
 }
 
-bool PlayerPower::initWithFileSp(Sprite* sprite)
+bool PlayerPower::initWithFileSp(Sprite* sprite, int bloodValue)
 {
 	bool bRet = false;
+	m_Bload = bloodValue;
 	do
 	{
 		CC_BREAK_IF(!sprite);
@@ -217,10 +221,14 @@ int PlayerPower::killMonster2(Vector<Monster* >* monsterList)
 			// 创建一个 Waved3D 动作
 			//CCActionInterval* waves = CCWaves::create(18, Size(50, 50), 10, 20, true, true);
 			//m_Nodegrid->runAction(waves);
-			ms->hurtMe(1);
+
+			ms->hurtMe(getBload());
+
+			std::string boold = StringUtils::format("%d", getBload());
+
 			FlowWord* fw = FlowWord::create();
 			ms->addChild(fw);
-			fw->showWord("-12400", Vec2(ms->getSprite()->getPosition().x, ms->getSprite()->getPosition().y + ms->getContentSize().height / 2));
+			fw->showWord(boold.c_str(), Vec2(ms->getSprite()->getPosition().x, ms->getSprite()->getPosition().y + ms->getContentSize().height / 2));
 			fw->gettextLab()->setColor(Color3B(255, 0, 0));
 			//CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(StringUtils::format("music/m%d.wav", i % 6).c_str(), false);
 		}
