@@ -295,3 +295,20 @@ Animate* AnimoTool::createMonsterAnimation3()
 
 	return action;
 }
+
+Sequence* AnimoTool::clickEffects(Vec2 pt, Size size)
+{
+	Vec2 pt2;
+	pt2.x = (pt.x - size.width / 2) < 0 ? -5 : 5;
+	pt2.y = (pt.y - size.height / 2) < 0 ? -5 : 5;
+
+	auto action = MoveTo::create(0.2f, pt2);
+	auto action2 = MoveTo::create(0.5f, Vec2(-pt2.x, -pt2.y));
+	auto action3 = ScaleTo::create(0.2f, 1.1f);
+	auto action4 = ScaleTo::create(0.5f, 1.0f);
+
+	Sequence* seq = Sequence::create(Spawn::create(action, action3, NULL),
+		Spawn::create(action2, action4, NULL), NULL);
+
+	return seq;
+}

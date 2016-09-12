@@ -20,11 +20,11 @@ public:
 	//我的初始化
 	void loadConfig();
 
-	//创建create()函数
-	CREATE_FUNC(BeginLayer);
-
 	//创建场景
 	static Scene* createScene();
+
+	//创建create()函数
+	CREATE_FUNC(BeginLayer);
 
 	//调用选择场景
 	void nextSceneCallback(Ref* pSender);

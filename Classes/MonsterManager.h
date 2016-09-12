@@ -19,15 +19,10 @@ public:
 	MonsterManager();
 	~MonsterManager();
 
-	static MonsterManager* createWithLevel(ValueVector monsterPoints);
+	static MonsterManager* create(ValueVector monsterPoints, int level);
 
 	//初始化函数
-	bool initWithLevel(ValueVector monsterPoints);
-
-	static MonsterManager* createWithLevel(ValueVector monsterPoints, int level);
-
-	//初始化函数
-	bool initWithLevel(ValueVector monsterPoints, int level);
+	bool init(ValueVector monsterPoints, int level);
 
 	//逻辑函数
 	void logic();
@@ -65,8 +60,6 @@ public:
 private:
 	ValueVector                 m_monsterPoints;
 	Vector<Monster*>        m_monsterList;                  //怪物列表
-	Vector<Monster*>        m_notShowMonsterList;     //未出场的怪物列表
-	Vector<PlayerPower*> m_monsterPowerList;
 	Boss*                           m_boss;
 	int                                m_level;
 };

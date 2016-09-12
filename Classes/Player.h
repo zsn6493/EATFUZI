@@ -19,14 +19,10 @@ public:
 	//创建player
 	static Player* create(Sprite* sprite);
 
-	//csv创建player
-	static Player* createFromCsvFileByID(int iHeroID);
-
 	//以图片初始化
-	virtual bool initWithFile(Sprite* sprite);
+	virtual bool init(Sprite* sprite);
 
-	//以csv初始化
-	bool  initFromCsvFileByID(int iHeroID);
+	void Player::setSpecialName(std::string battleName);
 
 	//玩家的moveby动作
 	void movePlayer(int flag);
@@ -37,6 +33,9 @@ public:
 	void moveZombie(float dt);
 
 	void updateCallBack(float dt);
+
+	CC_SYNTHESIZE(std::string, m_BattleName, BattleName);	//称号
+	CC_SYNTHESIZE(int, m_PepLevel, PepLevel);	//人物等级
 
 	CC_SYNTHESIZE(int, m_iBaseAtk, iBaseAtk);				//基础攻击力
 	CC_SYNTHESIZE(int, m_iCurAtk, iCurAtk);				    //当前攻击力

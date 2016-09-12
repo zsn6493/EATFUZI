@@ -10,9 +10,6 @@ using namespace CocosDenshion;
 Boss::Boss(void)
 {
 	m_MonsterPower = NULL;
-	m_Speed = 10;
-	m_Times = 10;
-
 	scheduleUpdate();
 }
 
@@ -24,7 +21,7 @@ Boss* Boss::create(Sprite* sprite, int ps)
 {
 	Boss *boss = new Boss();
 	boss->m_Ps = (PowerEnumStatus)ps;                 //¹ÖÎïÀàÐÍ
-	if (boss && boss->initWithFile(sprite))
+	if (boss && boss->init(sprite))
 	{
 		boss->autorelease();
 		return boss;
@@ -33,7 +30,7 @@ Boss* Boss::create(Sprite* sprite, int ps)
 	return NULL;
 }
 
-bool Boss::initWithFile(Sprite* sprite)
+bool Boss::init(Sprite* sprite)
 {
 	bool bRet = false;
 	do

@@ -25,7 +25,7 @@ public:
 	static BossManager* createWithLevel(Vec2 pt, int level);
 
 	//初始化
-	bool initWithLevel(Vec2 pt, int level);
+	bool init(Vec2 pt, int level);
 
 	//设置当前技能类型
 	void changeStatus(PowerEnumStatus ps);

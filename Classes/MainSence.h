@@ -21,10 +21,10 @@ public:
 	//创建场景
 	static cocos2d::Scene* createScene(int level);
 
-	static MainSence*  create(int level, ShowLayer* showLayer);
+	static MainSence*  create(int level);
 
 	//初始化
-	bool init(int level, ShowLayer* showLayer);
+	bool init(int level);
 
 	void OnEnter();
 
@@ -42,23 +42,15 @@ public:
 	//消耗杀敌数
 	void deNum(Ref* pData);
 
-	//逻辑
-	void logic(float dt);
-
-	//设置背景与游戏视角
-	void setViewPoint();
-
 	//杀敌数
-	CC_SYNTHESIZE(int, m_Num, DeNum);
+	CC_SYNTHESIZE(int, m_KillMonsterNum, KillMonsterNum);
 
 	//存储当前场景
 	CC_SYNTHESIZE(Scene*, m_oriScene, OriScene);
 
 private:
-	Layer*  m_BK;                   //背景层
-	int        m_level;                        //功能选择
-	ShowLayer* m_viewLayer; //视图层
-	Layer*         m_moveLayer;        //移动背景
-	Label*         m_Label;        //杀怪数Label
+	int        m_level;                        //背景选择选择
+	Label*  m_Label;                       //杀怪数Label
+	Layer*  m_BackGrandLayer;    //背景层
 };
 #endif // ___MAINSENCE_H__

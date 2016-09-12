@@ -14,6 +14,7 @@
 #include "Player.h"
 #include "Monster.h"
 #include "ShowLayer.h"
+#include "ProgressView.h"
 USING_NS_CC;
 
 using namespace cocostudio;
@@ -96,6 +97,12 @@ public:
 
 	//人物技能提升
 	void usePeoUp(Ref* pSender);
+
+	void loseBlood(Ref* pData);
+
+	ProgressView* m_pProgressView;
+
+	Sprite* m_Target;
 private:
 	ShowLayer* m_viewLayer;                	//游戏视图层
 	int m_flag;                                            //移动方向标识

@@ -24,7 +24,7 @@ Monster* Monster::create(Sprite* sprite, int ps)
 	Monster *monster = new Monster();
 	monster->m_Ps = (PowerEnumStatus)ps;  //¹ÖÎïÀàÐÍ
 
-	if (monster && monster->initWithFile(sprite))
+	if (monster && monster->init(sprite))
 	{
 		monster->autorelease();
 		return monster;
@@ -34,7 +34,7 @@ Monster* Monster::create(Sprite* sprite, int ps)
 	return NULL;
 }
 
-bool Monster::initWithFile(Sprite* sprite)
+bool Monster::init(Sprite* sprite)
 {
 	bool bRet = false;
 	do
@@ -85,8 +85,8 @@ void Monster::simpleAI(Vec2 pPos)
 	}
 	else
 	{
-		auto jb = JumpBy::create(0.5, Vec2(-10, 5), 10, 1);
-		this->runAction(jb);
+		auto jumpBy = JumpBy::create(0.5, Vec2(-10, 5), 10, 1);
+		this->runAction(jumpBy);
 	}
 }
 
@@ -99,8 +99,8 @@ void Monster::simpleAI2(Vec2 pPos)
 	}
 	else
 	{
-		auto jb = JumpBy::create(0.5, Vec2(-5, 20), 10, 1);
-		this->runAction(jb);
+		auto jumpBy = JumpBy::create(0.5, Vec2(-5, 20), 10, 1);
+		this->runAction(jumpBy);
 	}
 }
 

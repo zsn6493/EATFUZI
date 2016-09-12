@@ -20,16 +20,10 @@ public:
 	~PlayerManager();
 
 	//创建create()
-	static PlayerManager* createWithLevel(Vec2 pt);
-
-	//初始化
-	bool initWithLevel(Vec2 pt);
-
-	//创建create()
 	static PlayerManager* createWithLevel(Vec2 pt, int level);
 
 	//初始化
-	bool initWithLevel(Vec2 pt, int level);
+	bool init(Vec2 pt, int level);
 
 	//获取player
 	Player* getPlayer();
@@ -40,14 +34,8 @@ public:
 	//设置当前技能类型
 	void changeStatus(PowerEnumStatus ps);
 
-	//吃怪物
-	int eatMonster();
-
 	//使用技能
 	void usePower();
-
-	//使用火焰技能
-	void useFirePower();
 
 	//跳跃
 	void jumpPlayer();
@@ -59,41 +47,29 @@ public:
 	int killMonster(Vector<Monster*>* monsterList);
 
 	//游戏逻辑
-	void logic(int mapLength, int MinLength, int MaxLength);
+	void logic();
 
 	void startPlayerMoveAction();
 
 	void stopPlayerAction();
 
-	void useBasePower();
+	void useFZ(Vec2 pt, Vector<Monster*>* monsterList, Boss* boss, bool firePower);
 
-	bool m_IsFighting;
+	void useZombie(Vec2 pt, int level);
+
+	void controlAction(float dt);
 
 	CC_SYNTHESIZE(bool, m_BigPower, BigPowerStatus);
 	CC_SYNTHESIZE(Vector<Player*>*, m_zombiePtr, zombiePtr);
 	CC_SYNTHESIZE(int, m_HurtValue, HurtValue);
 
-	void useBigPower(Vector<Monster*>* monsterList, int level);
-
-	void useBigPowerCallBack(float dt);
-
-	void useFZ(Vec2 pt, Vector<Monster*>* monsterList, Boss* boss, bool firePower);
-
-	void useZombie(Vec2 pt, Vector<Monster* >* monsterList, Boss* boss, int level);
-
-	void PlayerManager::controlAction(float dt);
-
 private:
 	Player*                  m_Player;                //冒险家
 	PlayerPower*        m_Power;                 //技能
-	Monster*               m_FindMonster;        //探测到的怪物
 	PowerEnumStatus m_Ps;                       //技能类型
 	Vec2                      m_Origin;                 //玩家初始点
-	int                          m_Destflag;             //冒险家之前的方向
-	int                          m_PlayerTimes;       //点击次数（临时）
 	std::string               m_FileName;           //创建冒险家的初始图片资源
 	Rect                       m_Rect;                  //图片资源的显示区域
-	int                          m_Deadcount;
 	Vector<Player*> m_zombieVector;
 	int m_level;
 };

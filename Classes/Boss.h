@@ -18,17 +18,11 @@ public:
 	Boss(void);
 	~Boss(void);
 
-	//通过csv创建monster
-	Boss* createFromCsvFileByID(int iHeroID);
-
-	//初始化
-	bool initFromCsvFileByID(int iHeroID);
-
 	//创建函数
 	static Boss* create(Sprite* sprite, int ps);
 
 	//以图片初始化
-	virtual bool initWithFile(Sprite* sprite);
+	virtual bool init(Sprite* sprite);
 
 	//AI
 	void simpleAI(Vec2 pPos);
@@ -43,11 +37,6 @@ public:
 	CC_SYNTHESIZE(Vec2, m_Orgin, Origin);
 
 private:
-	//PlayerPower* m_MonsterPower;          //怪物技能
-	int m_Speed;                                       //怪物的速度
 	Player* m_Player;                                //player
-	//PowerEnumStatus m_Ps;                     //技能类型
-	//Vec2 m_Orgin;                                     //初始座标点
-	int m_Times;                                        //Boss嘚瑟次数
 };
 #endif

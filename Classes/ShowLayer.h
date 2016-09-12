@@ -22,18 +22,9 @@ public:
 	ShowLayer();
 	~ShowLayer();
 
-	//创建场景
-	static cocos2d::Scene* createScene();
-
-	//初始化
-	virtual bool init();
-
 	virtual void onEnter() override;
 
-	bool initShow(int level);
-
-	//我的初始化
-	void loadConfig();
+	bool init(int level);
 
 	//我的初始化
 	void loadConfig(int level);
@@ -49,9 +40,6 @@ public:
 
 	//移动player
 	void movePlayer(int flag);
-
-	//创建create()函数
-	CREATE_FUNC(ShowLayer);
 
 	static ShowLayer* create(int level);
 

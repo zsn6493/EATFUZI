@@ -8,7 +8,6 @@ BossManager::BossManager()
 {
 	m_Ps = PowerEnumStatus::useNone;
 	m_Power = nullptr;
-	m_Destflag = 1;
 	m_Boss = nullptr;
 	m_BOrigin = Vec2(0, 0);
 	m_Boss = nullptr;
@@ -20,17 +19,9 @@ BossManager::~BossManager()
 }
 
 /*初始化*/
-bool BossManager::initWithLevel(Vec2 pt, int level)
+bool BossManager::init(Vec2 pt, int level)
 {
 	m_Level = level;
-
-	if (level == 3)
-	{
-	}
-
-	//创建player的技能
-	//m_power = PlayerPower::create(m_boss);
-	//this->addChild(m_power);
 
 	return true;
 }
@@ -38,17 +29,17 @@ bool BossManager::initWithLevel(Vec2 pt, int level)
 /*创建英雄*/
 BossManager* BossManager::createWithLevel(Vec2 pt, int level)
 {
-	BossManager* bossMgr = new BossManager();
-	if (bossMgr && bossMgr->initWithLevel(pt, level))
+	BossManager* bossManager = new BossManager();
+	if (bossManager && bossManager->init(pt, level))
 	{
-		bossMgr->autorelease();
+		bossManager->autorelease();
 	}
 	else
 	{
-		CC_SAFE_DELETE(bossMgr);
+		CC_SAFE_DELETE(bossManager);
 	}
 
-	return bossMgr;
+	return bossManager;
 }
 
 void BossManager::createBoss(float dt)

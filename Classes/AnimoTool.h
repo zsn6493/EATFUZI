@@ -42,5 +42,7 @@ public:
 	static Animate* createBoss3Animotion();
 
 	static Animate* createMonsterAnimation3();
+
+	static Sequence* clickEffects(Vec2 pt, Size size);
 };
 #endif

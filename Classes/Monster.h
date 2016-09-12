@@ -19,17 +19,11 @@ public:
 	Monster(void);
 	~Monster(void);
 
-	//通过csv创建monster
-	Monster* createFromCsvFileByID(int iHeroID);
-
-	//初始化
-	bool initFromCsvFileByID(int iHeroID);
-
 	//创建函数
 	static Monster* create(Sprite* sprite, int ps);
 
 	//以图片初始化
-	virtual bool initWithFile(Sprite* sprite);
+	virtual bool init(Sprite* sprite);
 
 	//AI
 	void simpleAI(Vec2 pPos);

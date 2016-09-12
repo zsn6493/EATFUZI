@@ -121,6 +121,17 @@ bool ControlLayer::init(Layer* layer)
 	peoUpMenu->setPosition(Vec2::ZERO);
 	this->addChild(peoUpMenu, 1);
 
+	m_Target = Sprite::create("CloseNormal.png");
+	m_Target->setScale(5.0f);
+	m_Target->setVisible(false);
+	this->addChild(m_Target);
+
+	//订阅切换失败场景
+	NOTIFY->addObserver(this,
+		callfuncO_selector(ControlLayer::loseBlood),
+		"LOSEBLOOD",
+		NULL);
+
 	return true;
 }
 
@@ -131,10 +142,23 @@ void ControlLayer::loadConfig()
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	//加载玩家状态UI（血条和魔力值）
-	auto _rootNode = CSLoader::createNode("PlayerStats.csb");
-	_rootNode->setPosition(Vec2(origin.x, origin.y + 140));
-	_rootNode->setScale(0.5f);
-	this->addChild(_rootNode, 2);
+	//auto _rootNode = CSLoader::createNode("PlayerStats.csb");
+	//_rootNode->setPosition(Vec2(origin.x, origin.y + 120));
+	//_rootNode->setScale(0.5f);
+
+	//this->addChild(_rootNode, 2);
+
+	//初始化ProgressView
+
+	m_pProgressView = new ProgressView;
+	m_pProgressView->setPosition(Vec2(visibleSize.width - 350, origin.y + visibleSize.height - 30));
+	m_pProgressView->setScaleY(3.5f);
+	m_pProgressView->setScaleX(5.0f);
+	m_pProgressView->setBackgroundTexture("bloodBar/hr_slider_bg.png");
+	m_pProgressView->setForegroundTexture("bloodBar/hr_slider.png");
+	m_pProgressView->setTotalProgress(100.0f);
+	m_pProgressView->setCurrentProgress(100.0f);
+	this->addChild(m_pProgressView, 2);
 }
 
 //触摸移动事件，也就是手指在屏幕点击开始的过程
@@ -148,12 +172,14 @@ void ControlLayer::onTouchesBegan(const std::vector<Touch*>& touches, cocos2d::E
 
 		m_startPoint = touch->getLocation();
 
-		//isTouch = true;
+		isTouch = true;
 
 		m_startTime = getCurrentTime();
 
+		//m_Target->setVisible(true);
+		m_Target->setPosition(touch->getLocation());
 		//处理长按事件
-		this->schedule(schedule_selector(ControlLayer::updatelongprogress), 1);
+		this->schedule(schedule_selector(ControlLayer::updatelongprogress), 0.5);
 	}
 }
 
@@ -162,6 +188,11 @@ void ControlLayer::onTouchesMoved(const std::vector<Touch*>& touches, cocos2d::E
 {
 	for (auto &touch : touches)
 	{
+		if (m_longProgress)
+		{
+			//m_Target->setVisible(true);
+			m_Target->setPosition(touch->getLocation());
+		}
 		//m_viewLayer->removeJoint();
 		/*
 		m_Count++;
@@ -181,7 +212,7 @@ void ControlLayer::onTouchesEnded(const std::vector<Touch*>& touches, cocos2d::E
 	for (auto &touch : touches)
 	{
 		auto location = touch->getLocation();
-
+		m_Target->setVisible(false);
 		isTouch = false;
 		pressTimes = 0;
 		this->unschedule(schedule_selector(ControlLayer::updatelongprogress));
@@ -191,6 +222,11 @@ void ControlLayer::onTouchesEnded(const std::vector<Touch*>& touches, cocos2d::E
 			touchCounts = 0;
 			m_longProgress = false;
 
+			Sprite* sp = Sprite::create("CloseNormal.png");
+			sp->setPosition(100, 400);
+			auto mb = MoveTo::create(0.5, location);
+			sp->runAction(mb);
+			m_viewLayer->addChild(sp);
 			return;
 		}
 
@@ -242,15 +278,6 @@ void ControlLayer::gameOverCallback(Ref* pSender)
 void ControlLayer::usePower1(Ref* pSender)
 {
 	m_viewLayer->useZombie(1);
-	/*
-	if (m_viewLayer->getFirePower())
-	{
-	m_viewLayer->setFirePower(false);
-	}
-	else
-	{
-	m_viewLayer->setFirePower(true);
-	}*/
 }
 
 void ControlLayer::usePowerUp(Ref* pSender)
@@ -258,7 +285,7 @@ void ControlLayer::usePowerUp(Ref* pSender)
 	int s = 10;
 
 	auto layer = (MainSence*)this->getParent()->getChildByTag(1);
-	int num = layer->getDeNum();
+	int num = layer->getKillMonsterNum();
 	if ((num - 10) < 0)
 	{
 		return;
@@ -277,7 +304,7 @@ void ControlLayer::usePeoUp(Ref* pSender)
 	int s = 3;
 
 	auto layer = (MainSence*)this->getParent()->getChildByTag(1);
-	int num = layer->getDeNum();
+	int num = layer->getKillMonsterNum();
 	if ((num - 3) < 0)
 	{
 		return;
@@ -321,6 +348,8 @@ void ControlLayer::updatelongprogress(float ft)
 
 		if (pressTimes >= 2) {
 			m_longProgress = true;
+
+			m_Target->setVisible(true);
 			//onLongPressed();
 			//m_viewLayer->removeJoint();
 		}
@@ -336,4 +365,17 @@ long long ControlLayer::getCurrentTime()
 	struct timeval tm;
 	gettimeofday(&tm, NULL);
 	return (long long)(tm.tv_sec * 1000 + tm.tv_usec / 1000);
+}
+
+void ControlLayer::loseBlood(Ref* pData)
+{
+	int loseBlood = *(int*)pData;
+	int currValue = m_pProgressView->getCurrentProgress();
+	if (currValue <= loseBlood)
+	{
+		m_pProgressView->getProgressForeground()->setColor(Color3B(200, 100, 100));
+		m_pProgressView->setCurrentProgress(100);
+		return;
+	}
+	m_pProgressView->setCurrentProgress(currValue - loseBlood);
 }
