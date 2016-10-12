@@ -30,13 +30,23 @@
 #define BOSS_ONE "boss_ (1).png"
 #define BOSS_TWO "Boss/Boss_SP (1).png"
 
-enum PowerEnumStatus
+enum CharType
 {
-	useNone,
-	useFire,
-	useIce,
-	useNewTypeOne,
-	useNewTypeTwo,
+	Origin = 0,
+	t1,
+	t2,
+	t3,
+	t4,
+	t5
 };
 
+enum GodArmType
+{
+	GodOrigin = 0,
+	Godt1,
+	Godt2,
+	Godt3,
+	Godt4,
+	Godt5
+};
 #endif

@@ -19,10 +19,10 @@ Monster::~Monster(void)
 {
 }
 
-Monster* Monster::create(Sprite* sprite, int ps)
+Monster* Monster::create(Sprite* sprite, int level)
 {
 	Monster *monster = new Monster();
-	monster->m_Ps = (PowerEnumStatus)ps;  //怪物类型
+	monster->m_CharType = (CharType)level;  //怪物类型
 
 	if (monster && monster->init(sprite))
 	{
@@ -53,12 +53,12 @@ bool Monster::init(Sprite* sprite)
 void Monster::loadConfigure()
 {
 	//判断人物类型 关联不同资源
-	switch (m_Ps)
+	switch (m_CharType)
 	{
-	case useFire:
+	case t1:
 		//this->schedule(schedule_selector(Monster::updateCallBack), 0.1f);
 		break;
-	case useIce:
+	case t2:
 		//this->schedule(schedule_selector(Monster::updateCallBack), 0.05f);
 		break;
 	}
@@ -66,11 +66,11 @@ void Monster::loadConfigure()
 
 void Monster::updateCallBack(float dt)
 {
-	if (m_Ps == PowerEnumStatus::useIce)
+	if (m_CharType == CharType::t1)
 	{
 		simpleAI(Vec2(0, 0));
 	}
-	else if (m_Ps == PowerEnumStatus::useFire)
+	else if (m_CharType == CharType::t2)
 	{
 		simpleAI2(Vec2(0, 0));
 	}
@@ -85,7 +85,7 @@ void Monster::simpleAI(Vec2 pPos)
 	}
 	else
 	{
-		auto jumpBy = JumpBy::create(0.5, Vec2(-10, 5), 10, 1);
+		auto jumpBy = JumpBy::create(0.5, Vec2(-20, 100), 10, 1);
 		this->runAction(jumpBy);
 	}
 }
@@ -99,14 +99,14 @@ void Monster::simpleAI2(Vec2 pPos)
 	}
 	else
 	{
-		auto jumpBy = JumpBy::create(0.5, Vec2(-5, 20), 10, 1);
+		auto jumpBy = JumpBy::create(0.5, Vec2(-15, 100), 30, 1);
 		this->runAction(jumpBy);
 	}
 }
 
 bool Monster::ContainMonsterPower(Player* player)
 {
-	if (m_Ps == useFire)
+	if (m_CharType == t1)
 	{
 		/*
 		Rect rect = player->boundingBox();
@@ -131,7 +131,7 @@ bool Monster::ContainMonsterPower(Player* player)
 }
 
 /*怪物技能类型设置*/
-void Monster::changeStatus(PowerEnumStatus ps)
+void Monster::changeStatus(CharType ct)
 {
-	this->m_Ps = ps;
+	this->m_CharType = ct;
 }

@@ -10,6 +10,8 @@ Player::Player(void)
 {
 	m_BattleName = "";
 	m_PepLevel = 0;
+	m_startMoveAction = false;
+	m_startFightAciton = false;
 }
 
 Player::~Player(void)
@@ -126,7 +128,7 @@ void Player::moveZombie(float dt)
 	}
 	default:
 	{		  //auto jb = JumpBy::create(0.7, Vec2(2, 10), 5, 1);
-			   auto mb = MoveBy::create(0.5, Vec3(10, 0, 0));
+			   auto mb = MoveBy::create(0.5, Vec3(15, 0, 0));
 			   mb->setTag(5);
 			   this->runAction(mb);
 			   break;

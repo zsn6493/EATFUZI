@@ -55,7 +55,7 @@ bool MonsterManager::init(ValueVector monsterPoints, int level)
 				  monster->setScale(0.5f);
 				  monster->setPosition(Vec2(monsterX + random % 25, monsterY));
 				  monster->setOrigin(Vec2(monsterX, monsterY));
-				  monster->changeStatus(PowerEnumStatus::useFire);
+				  monster->changeStatus(CharType::t1);
 				  this->addChild(monster, 1);
 
 				  auto power = PlayerPower::create(monster);
@@ -197,11 +197,11 @@ void MonsterManager::nextMap(CCTMXTiledMap* map, int maxLength)
 
 		int random = CCRANDOM_0_1() * 4 - CCRANDOM_0_1() * 4;
 		//创建怪物
-		auto monster = Monster::create(Sprite::create(FIRE_MONSTER), useFire);
+		auto monster = Monster::create(Sprite::create(FIRE_MONSTER), CharType::t1);
 		monster->setScale(1.0f);
 		monster->setPosition(Vec2(monsterX + random % 25, monsterY));
 		monster->setOrigin(Vec2(monsterX, monsterY));
-		monster->changeStatus(PowerEnumStatus::useFire);
+		monster->changeStatus(CharType::t1);
 		this->addChild(monster, 1);
 
 		//创建怪物技能
@@ -228,10 +228,11 @@ void MonsterManager::callMonsterIntoMap(float dt)
 			float monsterX = monsterPoint.at("x").asFloat();
 			float monsterY = monsterPoint.at("y").asFloat();
 
-			auto monster = Monster::create(Sprite::create(JUMP_MONSTER), useIce);
+			auto monster = Monster::create(Sprite::create(JUMP_MONSTER), CharType::t2);
 			//monster->setPosition(Vec2(monsterX, visibleSize.height - monsterY));
 			monster->setPosition(Vec2(monsterX, monsterY));
-			monster->setiHP(m_MonsterNum + 2);
+			//monster->setiHP(m_MonsterNum + 2);
+			monster->setiHP(100);
 			//monster->setScale(0.5f);
 			this->addChild(monster, 1);
 
@@ -268,7 +269,7 @@ void MonsterManager::callMonsterIntoMap2(float dt)
 			float monsterX = monsterPoint.at("x").asFloat();
 			float monsterY = monsterPoint.at("y").asFloat();
 
-			auto monster = Monster::create(Sprite::create("JI/JI (1).png"), useFire);
+			auto monster = Monster::create(Sprite::create("JI/JI (1).png"), CharType::t1);
 			//monster->setPosition(Vec2(monsterX, visibleSize.height - monsterY));
 			monster->setPosition(Vec2(monsterX, monsterY));
 			monster->setiHP(100);
@@ -311,7 +312,7 @@ int MonsterManager::killPlayer(Vector<Player*>* playerList)
 
 			float currentDistance = sqrt(reX * reX + reY * reY);
 
-			if (currentDistance < constractDistance)
+			if (currentDistance < constractDistance / 2)
 			{
 				monster->setmoveStatus(false);
 			}
@@ -331,7 +332,7 @@ void MonsterManager::controlAction(float dt)
 	{
 		if (monster->getmoveStatus())
 		{
-			monster->scheduleOnce(schedule_selector(Monster::updateCallBack), 0.2f);
+			monster->scheduleOnce(schedule_selector(Monster::updateCallBack), 0.25f);
 			if (monster->getstartMoveAction() == false)
 			{
 				monster->setstartMoveAction(true);

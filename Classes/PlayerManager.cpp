@@ -11,7 +11,7 @@ PlayerManager::PlayerManager()
 	m_Power = NULL;
 	m_HurtValue = 1;
 	m_BigPower = false;
-	m_Ps = PowerEnumStatus::useNone;
+	m_CharType = CharType::Origin;
 }
 
 PlayerManager::~PlayerManager()
@@ -41,28 +41,28 @@ bool PlayerManager::init(Vec2 pt, int level)
 	m_level = level;
 
 	//模拟默认类型
-	m_Ps = PowerEnumStatus::useNone;
+	m_CharType = CharType::Origin;
 
 	//判断人物类型 关联不同资源
-	switch (m_Ps)
+	switch (m_CharType)
 	{
-	case useNone:
+	case Origin:
 		m_FileName = NEWTYPE_ONE;
 		m_Rect = NEWTYPE_ONE_RECT;
 		break;
-	case useFire:
+	case t1:
 		m_FileName = FIRE_MONSTER;
 		m_Rect = FIRE_MONSTER_RECT;
 		break;
-	case useIce:
+	case t2:
 		m_FileName = JUMP_MONSTER;
 		m_Rect = JUMP_MONSTER_RECT;
 		break;
-	case useNewTypeOne:
+	case t3:
 		m_FileName = NEWTYPE_TWO;
 		m_Rect = NEWTYPE_TWO_RECT;
 		break;
-	case useNewTypeTwo:
+	case t4:
 		m_FileName = NEWTYPE_ONE;
 		m_Rect = NEWTYPE_ONE_RECT;
 		break;
@@ -74,17 +74,17 @@ bool PlayerManager::init(Vec2 pt, int level)
 	m_Player->setPosition(Vec2(pt.x + m_Player->getContentSize().width / 2, pt.y + m_Player->getContentSize().height / 2));
 	this->addChild(m_Player, 1);
 
-	m_Player->setSpecialName("MH 0079");
+	m_Player->setSpecialName("MHunter");
 
 	this->setzombiePtr(&m_zombieVector);
 
-	//struct timeval now;
-	//gettimeofday(&now, NULL);
+	struct timeval now;
+	gettimeofday(&now, NULL);
 
-	////初始化随机种子
-	////timeval是个结构体，里边有俩个变量，一个是以秒为单位的，一个是以微妙为单位的
-	//unsigned rand_seed = (unsigned)(now.tv_sec * 1000 + now.tv_usec / 1000);    //都转化为毫秒
-	//srand(rand_seed);
+	//初始化随机种子
+	//timeval是个结构体，里边有俩个变量，一个是以秒为单位的，一个是以微妙为单位的
+	unsigned rand_seed = (unsigned)(now.tv_sec * 1000 + now.tv_usec / 1000);    //都转化为毫秒
+	srand(rand_seed);
 
 	this->schedule(schedule_selector(PlayerManager::controlAction), 0.5f);
 
@@ -93,19 +93,19 @@ bool PlayerManager::init(Vec2 pt, int level)
 
 void PlayerManager::startPlayerMoveAction()
 {
-	if (PowerEnumStatus::useNone == m_Ps)
+	if (CharType::Origin == m_CharType)
 	{
 		auto right = AnimoTool::newTypeOneRightMoveAnimotion();
 		m_Player->getSprite()->runAction(right);
 	}
-	else if (m_Ps == useNewTypeTwo)
+	else if (m_CharType == t2)
 	{
 	}
 }
 
 void PlayerManager::stopPlayerAction()
 {
-	if (m_Ps == PowerEnumStatus::useNone)
+	if (m_CharType == CharType::Origin)
 	{
 		m_Player->getSprite()->stopAllActions();
 		m_Player->bindSprite(Sprite::create(m_FileName, m_Rect));
@@ -148,9 +148,9 @@ Player* PlayerManager::getPlayer()
 	return this->m_Player;
 }
 
-void PlayerManager::useFZ(Vec2 pt, Vector<Monster* >* monsterList, Boss* boss, bool firePower)
+void PlayerManager::useSinglePower(Vec2 pt, Vector<Monster* >* monsterList, Boss* boss, bool firePower)
 {
-	auto power = PlayerPower::createSp(Sprite::create("Arm4.png"), CCRANDOM_0_1() * this->getHurtValue());
+	auto power = PlayerPower::createSp(Sprite::create("Arm4.png"), 0, CCRANDOM_0_1() * this->getHurtValue());
 	auto winSize = Director::getInstance()->getWinSize();
 
 	power->setFirePower(firePower);
@@ -186,6 +186,25 @@ void PlayerManager::useFZ(Vec2 pt, Vector<Monster* >* monsterList, Boss* boss, b
 	this->addChild(power);
 }
 
+void PlayerManager::useLongPower(Vec2 pt, Vector<Monster* >* monsterList, Boss* boss)
+{
+	auto power = PlayerPower::createSp(Sprite::create("Arm1.png"), 1, 1000);
+
+	Vec2 playerPt = getPlayer()->getPosition();
+	power->setPosition(playerPt);
+
+	auto mb = MoveTo::create(0.4, pt);
+	CCEaseBackIn* backIn = CCEaseBackIn::create(dynamic_cast<CCActionInterval *>(mb));
+	power->runAction(backIn);
+
+	power->setAnchorPoint(Vec2(0.5f, 0.5f));
+
+	power->monsterList = monsterList;
+	power->boss = boss;
+
+	this->addChild(power);
+}
+
 void PlayerManager::useZombie(Vec2 pt, int level)
 {
 	auto zombie = Player::create(Sprite::create(m_FileName, m_Rect));
@@ -195,31 +214,31 @@ void PlayerManager::useZombie(Vec2 pt, int level)
 	int r = rand() % level;
 	switch (r)
 	{
-	case1:
+	case 1:
 	{
-		zombie->getSprite()->setColor(Color3B(0, 255, 255)); //0,255,255 255,215,0 218,165,32
-		break;
+			  zombie->getSprite()->setColor(Color3B(0, 255, 255));
+			  break;
 	}
-	case2:
+	case 2:
 	{
-		zombie->getSprite()->setColor(Color3B(75, 0, 130));
-		zombie->setScale(2.0f);
-		break;
+			  zombie->getSprite()->setColor(Color3B(75, 0, 130));
+			  zombie->setScale(2.0f);
+			  break;
 	}
-	case3:
+	case 3:
 	{
-		zombie->getSprite()->setColor(Color3B(255, 215, 0));
-		break;
+			  zombie->getSprite()->setColor(Color3B(255, 215, 0));
+			  break;
 	}
-	case4:
+	case 4:
 	{
-		zombie->getSprite()->setColor(Color3B(218, 165, 32));
-		break;
+			  zombie->getSprite()->setColor(Color3B(218, 165, 32));
+			  break;
 	}
-	case5:
+	case 5:
 	{
-		zombie->getSprite()->setColor(Color3B(255, 0, 0));
-		break;
+			  zombie->getSprite()->setColor(Color3B(255, 0, 0));
+			  break;
 	}
 	default:
 		break;
@@ -233,9 +252,9 @@ void PlayerManager::useZombie(Vec2 pt, int level)
 }
 
 /*改变技能类型*/
-void PlayerManager::changeStatus(PowerEnumStatus ps)
+void PlayerManager::changeStatus(CharType ct)
 {
-	this->m_Ps = ps;
+	this->m_CharType = ct;
 	this->m_Power->cleanSprite();
 }
 
@@ -249,13 +268,13 @@ int PlayerManager::killMonster(Vector<Monster*>* monsterList)
 		{
 			float contractX = zombie->getContentSize().width / 2 + monster->getContentSize().width / 2;
 			float contractY = zombie->getContentSize().height / 2 + monster->getContentSize().height / 2;
-			float contractDistance = sqrt(contractX * contractY + contractX * contractY);
+			float contractDistance = sqrt(contractX * contractX + contractY * contractY);
 
 			float currentX = abs(zombie->getPosition().x - monster->getPosition().x);
 			float currentY = abs(zombie->getPosition().y - monster->getPosition().y);
 			float currentDistance = sqrt(currentX * currentX + currentY * currentY);
 
-			if (currentDistance < contractDistance)
+			if (currentDistance <= contractDistance / 2)
 			{
 				zombie->setmoveStatus(false);
 				monster->setAcceptBlood(CCRANDOM_0_1() * this->getHurtValue());

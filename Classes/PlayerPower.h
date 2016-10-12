@@ -22,47 +22,30 @@ public:
 	//创建player
 	static PlayerPower* create(Node* node);
 
-	//csv创建player
-	static PlayerPower* createFromCsvFileByID(int iHeroID);
-
 	//以图片初始化
 	virtual bool initWithFile(Node* node);
 
-	//以csv初始化
-	bool  initFromCsvFileByID(int iHeroID);
+	bool initWithFileSp(Sprite* sp, int powerNum, int bloodValue);
 
-	//火技能
-	void useFire(Vec2 vec2);
+	static PlayerPower* createSp(Sprite* sprite, int powerNum, int bloodValue);
 
-	//冰技能
-	void useIce(Vec2 vec2);
+	int singlePowerkillMonster(Vector<Monster*>* monsterList);
 
-	//boom特效（待定）
-	void useboom(Vec2 vec);
+	int singlePowerkillBoss(Boss* boss);
 
-	//怪物使用火技能
-	void useMonsterFire(Vec2 vec2, int flag);
-
-	bool m_visiable;                          //怪物的是否可利用
-
-	bool initWithFileSp(Sprite* sp, int bloodValue);
-
-	static PlayerPower* createSp(Sprite* sprite, int bloodValue);
+	int longPowerkillMonster(Vector<Monster*>* monsterList);
 
 	void updateCallBack(float dt);
 
-	int killMonster2(Vector<Monster*>* monsterList);
+	virtual void singleUpdate(float dt);
 
-	virtual void update(float dt);
+	virtual void longUpdate(float dt);
 
 	Vector<Monster*>* monsterList;
-
 	Boss* boss;
 
 	CC_SYNTHESIZE(bool, m_FirePower, FirePower);
 	CC_SYNTHESIZE(int, m_Bload, Bload);
-
-	int killBoss(Boss* boss);
 
 private:
 	Sprite* m_power;                        //技能图片资源

@@ -28,12 +28,12 @@ public:
 	void simpleAI(Vec2 pPos);
 
 	//设置技能类型
-	void changeStatus(PowerEnumStatus ps);
+	void changeStatus(CharType ps);
 
 	void updatCallBack(float);
 
 	CC_SYNTHESIZE(PlayerPower*, m_MonsterPower, Power);
-	CC_SYNTHESIZE(PowerEnumStatus, m_Ps, PowerStatus);
+	CC_SYNTHESIZE(CharType, m_CharType, CharType);
 	CC_SYNTHESIZE(Vec2, m_Orgin, Origin);
 
 private:

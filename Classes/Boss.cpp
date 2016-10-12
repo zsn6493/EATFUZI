@@ -20,7 +20,7 @@ Boss::~Boss(void)
 Boss* Boss::create(Sprite* sprite, int ps)
 {
 	Boss *boss = new Boss();
-	boss->m_Ps = (PowerEnumStatus)ps;                 //怪物类型
+	boss->m_CharType = (CharType)ps;                 //怪物类型
 	if (boss && boss->init(sprite))
 	{
 		boss->autorelease();
@@ -38,11 +38,11 @@ bool Boss::init(Sprite* sprite)
 		CC_BREAK_IF(!sprite);
 		bindSprite(sprite);
 
-		if (m_Ps == useFire)
+		if (m_CharType == t1)
 		{
 			this->schedule(schedule_selector(Boss::updatCallBack));
 		}
-		else if (m_Ps == useIce)
+		else if (m_CharType == t2)
 		{
 			//auto action = AnimoTool::createBoss2Animotion();
 			//sprite->runAction(action);
@@ -56,7 +56,7 @@ bool Boss::init(Sprite* sprite)
 /*怪物AI*/
 void Boss::simpleAI(Vec2 pPos)
 {
-	if (m_Ps == useFire)
+	if (m_CharType == t1)
 	{
 		if (this->getPosition().x <= 0)
 		{
@@ -69,15 +69,15 @@ void Boss::simpleAI(Vec2 pPos)
 			//this->runAction(mb);
 		}
 	}
-	else if (m_Ps == useIce)
+	else if (m_CharType == t2)
 	{
 	}
 }
 
 /*怪物技能类型设置*/
-void Boss::changeStatus(PowerEnumStatus ps)
+void Boss::changeStatus(CharType ct)
 {
-	this->m_Ps = ps;
+	this->m_CharType = ct;
 }
 
 void Boss::updatCallBack(float dt)

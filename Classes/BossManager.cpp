@@ -6,7 +6,7 @@
 
 BossManager::BossManager()
 {
-	m_Ps = PowerEnumStatus::useNone;
+	m_CharType = CharType::Origin;
 	m_Power = nullptr;
 	m_Boss = nullptr;
 	m_BOrigin = Vec2(0, 0);
@@ -44,7 +44,7 @@ BossManager* BossManager::createWithLevel(Vec2 pt, int level)
 
 void BossManager::createBoss(float dt)
 {
-	m_Boss = Boss::create(Sprite::create(BOSS_TWO), useFire);
+	m_Boss = Boss::create(Sprite::create(BOSS_TWO), t1);
 	m_Boss->setAnchorPoint(Vec2(0.5, 0.5));
 	m_Boss->setOrigin(m_BOrigin);
 	m_Boss->setPosition(m_BOrigin);

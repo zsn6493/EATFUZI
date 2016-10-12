@@ -31,6 +31,9 @@ ControlLayer::ControlLayer()
 {
 	m_flag = 0;
 	m_longProgress = false;
+	m_LongTouchLabel = nullptr;
+	m_Target = nullptr;
+	m_LabelCount = 0;
 }
 
 ControlLayer::~ControlLayer()
@@ -68,6 +71,10 @@ bool ControlLayer::init(Layer* layer)
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	m_LongTouchLabel = Node::create();
+	m_LongTouchLabel->setPosition(Vec2(0, 0));
+	this->addChild(m_LongTouchLabel);
 
 	//临时加载一个返回选择界面的按钮
 	auto closeItem = MenuItemImage::create(
@@ -126,11 +133,76 @@ bool ControlLayer::init(Layer* layer)
 	m_Target->setVisible(false);
 	this->addChild(m_Target);
 
+	////订阅切换失败场景
+	//NOTIFY->addObserver(this,
+	//	callfuncO_selector(ControlLayer::loseBlood),
+	//	"LOSEBLOOD",
+	//	NULL);
+
 	//订阅切换失败场景
 	NOTIFY->addObserver(this,
-		callfuncO_selector(ControlLayer::loseBlood),
-		"LOSEBLOOD",
+		callfuncO_selector(ControlLayer::activeMonster),
+		"ACMonster",
 		NULL);
+
+	for (int i = 1; i <= 5; i++)
+	{
+		switch (i)
+		{
+		case 1:
+		{
+				  Sprite* sp = Sprite::create("YIN2/YIN (7).png", Rect(0, 0, 57, 68));
+				  sp->setPosition(Vec2(100, 500));
+				  m_LongTouchLabel->addChild(sp);
+				  sp->setColor(Color3B(0, 255, 255));
+				  sp->setTag(i);
+				  sp->setVisible(false);
+				  break;
+		}
+		case 2:
+		{
+				  Sprite* sp = Sprite::create("YIN2/YIN (7).png", Rect(0, 0, 57, 68));
+				  sp->setPosition(Vec2(100 + 57 / 2 * (i - 1), 500));
+				  m_LongTouchLabel->addChild(sp);
+				  sp->setColor(Color3B(75, 0, 130));
+				  sp->setVisible(false);
+				  sp->setTag(i);
+				  break;
+		}
+		case 3:
+		{
+				  Sprite* sp = Sprite::create("YIN2/YIN (7).png", Rect(0, 0, 57, 68));
+				  sp->setPosition(Vec2(100 + 57 / 2 * (i - 1), 500));
+				  m_LongTouchLabel->addChild(sp);
+				  sp->setColor(Color3B(255, 215, 0));
+				  sp->setVisible(false);
+				  sp->setTag(i);
+				  break;
+		}
+		case 4:
+		{
+				  Sprite* sp = Sprite::create("YIN2/YIN (7).png", Rect(0, 0, 57, 68));
+				  sp->setPosition(Vec2(100 + 57 / 2 * (i - 1), 500));
+				  m_LongTouchLabel->addChild(sp);
+				  sp->setColor(Color3B(218, 165, 32));
+				  sp->setVisible(false);
+				  sp->setTag(i);
+				  break;
+		}
+		case 5:
+		{
+				  Sprite* sp = Sprite::create("YIN2/YIN (7).png", Rect(0, 0, 57, 68));
+				  sp->setPosition(Vec2(100 + 57 / 2 * (i - 1), 500));
+				  m_LongTouchLabel->addChild(sp);
+				  sp->setColor(Color3B(255, 0, 0));
+				  sp->setVisible(false);
+				  sp->setTag(i);
+				  break;
+		}
+		default:
+			break;
+		}
+	}
 
 	return true;
 }
@@ -150,10 +222,10 @@ void ControlLayer::loadConfig()
 
 	//初始化ProgressView
 
-	m_pProgressView = new ProgressView;
-	m_pProgressView->setPosition(Vec2(visibleSize.width - 350, origin.y + visibleSize.height - 30));
+	m_pProgressView = new ProgressView();
+	m_pProgressView->setPosition(Vec2(visibleSize.width - 300, origin.y + visibleSize.height - 30));
 	m_pProgressView->setScaleY(3.5f);
-	m_pProgressView->setScaleX(5.0f);
+	m_pProgressView->setScaleX(4.0f);
 	m_pProgressView->setBackgroundTexture("bloodBar/hr_slider_bg.png");
 	m_pProgressView->setForegroundTexture("bloodBar/hr_slider.png");
 	m_pProgressView->setTotalProgress(100.0f);
@@ -222,11 +294,7 @@ void ControlLayer::onTouchesEnded(const std::vector<Touch*>& touches, cocos2d::E
 			touchCounts = 0;
 			m_longProgress = false;
 
-			Sprite* sp = Sprite::create("CloseNormal.png");
-			sp->setPosition(100, 400);
-			auto mb = MoveTo::create(0.5, location);
-			sp->runAction(mb);
-			m_viewLayer->addChild(sp);
+			m_viewLayer->useLongPower(location);
 			return;
 		}
 
@@ -257,12 +325,12 @@ void ControlLayer::onTouchesEnded(const std::vector<Touch*>& touches, cocos2d::E
 		}
 		else if (touchCounts == 1)
 		{
-			this->scheduleOnce(schedule_selector(ControlLayer::updateDoubleDelay), 0.25);
-			touchCounts++;
+			//this->scheduleOnce(schedule_selector(ControlLayer::updateDoubleDelay), 0.25);
+			//touchCounts++;
 		}
 		else if (touchCounts == 0)
 		{
-			this->scheduleOnce(schedule_selector(ControlLayer::updateSingleDelay), 0.25);
+			this->scheduleOnce(schedule_selector(ControlLayer::updateSingleDelay), 0.15);
 			touchCounts++;
 		}
 	}
@@ -310,7 +378,7 @@ void ControlLayer::usePeoUp(Ref* pSender)
 		return;
 	}
 
-	m_viewLayer->setRand(m_viewLayer->getRand() + 1);
+	m_viewLayer->setcharType(m_viewLayer->getcharType() + 1);
 	NOTIFY->postNotification("DeNum", (Ref*)&s);
 }
 
@@ -327,7 +395,7 @@ void ControlLayer::updateSingleDelay(float ft)
 	if (touchCounts == 1)
 	{
 		//onSingleCLick();
-		m_viewLayer->useFZPower(m_startPoint);
+		m_viewLayer->useSinglePower(m_startPoint);
 		touchCounts = 0;
 	}
 }
@@ -367,15 +435,13 @@ long long ControlLayer::getCurrentTime()
 	return (long long)(tm.tv_sec * 1000 + tm.tv_usec / 1000);
 }
 
-void ControlLayer::loseBlood(Ref* pData)
+void ControlLayer::activeMonster(Ref* pData)
 {
-	int loseBlood = *(int*)pData;
-	int currValue = m_pProgressView->getCurrentProgress();
-	if (currValue <= loseBlood)
+	static int i = 0;
+	int data = *(int*)pData;
+	if (data > 0)
 	{
-		m_pProgressView->getProgressForeground()->setColor(Color3B(200, 100, 100));
-		m_pProgressView->setCurrentProgress(100);
-		return;
+		m_LongTouchLabel->getChildByTag(data)->setVisible(true);
 	}
-	m_pProgressView->setCurrentProgress(currValue - loseBlood);
+	m_viewLayer->setMonsterType(data);
 }

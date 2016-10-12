@@ -74,14 +74,17 @@ public:
 	void stopPlayerAnimotion();
 
 	//使用技能
-	void useFZPower(Vec2 pt);
+	void useSinglePower(Vec2 pt);
+
+	void useLongPower(Vec2 pt);
 
 	//使用zombie
 	void useZombie(int level);
 
 	CC_SYNTHESIZE(bool, m_FirePower, FirePower);
-	CC_SYNTHESIZE(int, m_Rand, Rand);
+	CC_SYNTHESIZE(int, m_CharType, charType);
 	CC_SYNTHESIZE(PhysicsWorld*, m_World, World);
+	CC_SYNTHESIZE(int, m_MonsterType, MonsterType);
 	//void removeJoint();
 
 private:

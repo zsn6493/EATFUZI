@@ -19,7 +19,7 @@ ShowLayer::ShowLayer()
 	//	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect(StringUtils::format("music/m%d.wav", i).c_str());
 
 	m_FirePower = false;
-	m_Rand = 1;
+	m_CharType = (int)CharType::t1;
 }
 
 ShowLayer::~ShowLayer()
@@ -129,7 +129,7 @@ void ShowLayer::loadConfig(int level)
 			  m_BossManager->setBOrigin(Vec2(bossPointX, bossPointY));
 			  m_Map->addChild(m_BossManager, 2);
 
-			  m_GodArmManager = GodArmManager::createWithLevel(1, m_PlayerManager, m_MonsterManager, m_BossManager);
+			  m_GodArmManager = GodArmManager::createWithLevel(GodArmType::Godt1, m_PlayerManager, m_MonsterManager, m_BossManager);
 			  m_GodArmManager->setPosition(Vec2(0, 0));
 			  m_Map->addChild(m_GodArmManager, 4);
 
@@ -210,10 +210,10 @@ Point ShowLayer::setViewPoint()
 
 void ShowLayer::useZombie(int level)
 {
-	m_PlayerManager->useZombie(Vec2(0, 0), m_Rand);
+	m_PlayerManager->useZombie(Vec2(0, 0), m_CharType);
 }
 
-void ShowLayer::useFZPower(Vec2 pt)
+void ShowLayer::useSinglePower(Vec2 pt)
 {
 	//点击粒子特效
 	CCParticleSystemQuad *mParticle = CCParticleSystemQuad::create("showClick.plist");
@@ -230,10 +230,18 @@ void ShowLayer::useFZPower(Vec2 pt)
 	this->m_Map->runAction(action);
 
 	//使用人物技能
-	m_PlayerManager->useFZ(pt,
+	m_PlayerManager->useSinglePower(pt,
 		m_MonsterManager->getMonsterList(),
 		m_BossManager->getboss(),
 		m_FirePower);
+}
+
+void ShowLayer::useLongPower(Vec2 pt)
+{
+	//使用人物技能
+	m_PlayerManager->useLongPower(pt,
+		m_MonsterManager->getMonsterList(),
+		m_BossManager->getboss());
 }
 
 /*创建测试使用的怪物*/

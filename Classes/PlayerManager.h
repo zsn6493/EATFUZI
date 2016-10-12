@@ -32,7 +32,7 @@ public:
 	void movePlayer(int flag);
 
 	//设置当前技能类型
-	void changeStatus(PowerEnumStatus ps);
+	void changeStatus(CharType ct);
 
 	//使用技能
 	void usePower();
@@ -53,7 +53,9 @@ public:
 
 	void stopPlayerAction();
 
-	void useFZ(Vec2 pt, Vector<Monster*>* monsterList, Boss* boss, bool firePower);
+	void useSinglePower(Vec2 pt, Vector<Monster*>* monsterList, Boss* boss, bool firePower);
+
+	void useLongPower(Vec2 pt, Vector<Monster*>* monsterList, Boss* boss);
 
 	void useZombie(Vec2 pt, int level);
 
@@ -66,7 +68,7 @@ public:
 private:
 	Player*                  m_Player;                //冒险家
 	PlayerPower*        m_Power;                 //技能
-	PowerEnumStatus m_Ps;                       //技能类型
+	CharType              m_CharType;                       //技能类型
 	Vec2                      m_Origin;                 //玩家初始点
 	std::string               m_FileName;           //创建冒险家的初始图片资源
 	Rect                       m_Rect;                  //图片资源的显示区域

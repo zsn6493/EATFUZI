@@ -100,9 +100,13 @@ public:
 
 	void loseBlood(Ref* pData);
 
+	void activeMonster(Ref* pData);
+
 	ProgressView* m_pProgressView;
 
 	Sprite* m_Target;
+
+	Node* m_LongTouchLabel;
 private:
 	ShowLayer* m_viewLayer;                	//游戏视图层
 	int m_flag;                                            //移动方向标识
@@ -112,6 +116,7 @@ private:
 	Vec2 m_startPoint;
 	Vec2 m_endPoint;
 	long long m_startTime;
+	int m_LabelCount;
 };
 
 #endif // ___CONTROLLAYER_H__

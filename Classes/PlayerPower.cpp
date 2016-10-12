@@ -6,11 +6,11 @@
 #include <string>
 
 USING_NS_CC;
+#define NOTIFY cocos2d::NotificationCenter::getInstance()
 
 PlayerPower::PlayerPower(void)
 {
 	m_power = NULL;
-	m_visiable = false;
 	m_boom = NULL;
 	m_FirePower = false;
 	m_Bload = 1;
@@ -33,10 +33,10 @@ PlayerPower* PlayerPower::create(Node* node)
 	return NULL;
 }
 
-PlayerPower* PlayerPower::createSp(Sprite* sprite, int bloodValue)
+PlayerPower* PlayerPower::createSp(Sprite* sprite, int powerNum, int bloodValue)
 {
 	PlayerPower *playerPower = new PlayerPower();
-	if (playerPower && playerPower->initWithFileSp(sprite, bloodValue))
+	if (playerPower && playerPower->initWithFileSp(sprite, powerNum, bloodValue))
 	{
 		playerPower->autorelease();
 		return playerPower;
@@ -46,7 +46,7 @@ PlayerPower* PlayerPower::createSp(Sprite* sprite, int bloodValue)
 	return NULL;
 }
 
-bool PlayerPower::initWithFileSp(Sprite* sprite, int bloodValue)
+bool PlayerPower::initWithFileSp(Sprite* sprite, int powerNum, int bloodValue)
 {
 	bool bRet = false;
 	m_Bload = bloodValue;
@@ -58,12 +58,20 @@ bool PlayerPower::initWithFileSp(Sprite* sprite, int bloodValue)
 		bRet = true;
 
 		//auto sp = Sprite::create("Arm.png");
-		m_Nodegrid = NodeGrid::create();
+		//m_Nodegrid = NodeGrid::create();
 
-		this->addChild(m_Nodegrid, 1);
-		//this->schedule(schedule_selector(PlayerPower::updateCallBack), 3.0f);
+		//this->addChild(m_Nodegrid, 1);
 
-		this->scheduleOnce(schedule_selector(PlayerPower::updateCallBack), 0.7f);
+		if (powerNum == 0)
+		{
+			this->schedule(schedule_selector(PlayerPower::singleUpdate), 0.2f);
+			this->scheduleOnce(schedule_selector(PlayerPower::updateCallBack), 0.7f);
+		}
+		else if (powerNum == 1)
+		{
+			this->schedule(schedule_selector(PlayerPower::longUpdate), 0.2f);
+			this->scheduleOnce(schedule_selector(PlayerPower::updateCallBack), 0.5f);
+		}
 	} while (0);
 
 	scheduleUpdate();
@@ -85,11 +93,6 @@ bool PlayerPower::initWithFile(Node* node)
 	return bRet;
 }
 
-bool PlayerPower::initFromCsvFileByID(int iHeroID)
-{
-	return false;
-}
-
 void PlayerPower::updateCallBack(float dt)
 {
 	if (m_FirePower)
@@ -101,117 +104,61 @@ void PlayerPower::updateCallBack(float dt)
 	this->removeFromParentAndCleanup(true);
 }
 
-//使用火焰技能
-void PlayerPower::useFire(Vec2 vec2)
-{
-	if (m_visiable == false)
-	{
-		if (getSprite() == NULL)
-		{
-			bindSprite(Sprite::create("Fire.png"));
-		}
-		else
-		{
-			getSprite()->setVisible(true);
-			m_visiable = true;
-		}
+////使用火焰技能
+//void PlayerPower::useFire(Vec2 vec2)
+//{
+//	if (m_visiable == false)
+//	{
+//		if (getSprite() == NULL)
+//		{
+//			bindSprite(Sprite::create("Fire.png"));
+//		}
+//		else
+//		{
+//			getSprite()->setVisible(true);
+//			m_visiable = true;
+//		}
+//
+//		this->setAnchorPoint(Vec2(1.0f, 0.5f));
+//		this->setPosition(Vec2(vec2.x + 20, vec2.y));
+//
+//		auto Func = [&]()
+//		{
+//			getSprite()->setVisible(false);
+//			m_visiable = false;
+//		};
+//
+//		auto mb = MoveBy::create(1.0f, Vec3(800, 0, 0));
+//		auto callback = CallFunc::create(Func);
+//		this->runAction(Sequence::create(mb, callback, NULL));
+//	}
+//}
 
-		this->setAnchorPoint(Vec2(1.0f, 0.5f));
-		this->setPosition(Vec2(vec2.x + 20, vec2.y));
-
-		auto Func = [&]()
-		{
-			getSprite()->setVisible(false);
-			m_visiable = false;
-		};
-
-		auto mb = MoveBy::create(1.0f, Vec3(800, 0, 0));
-		auto callback = CallFunc::create(Func);
-		this->runAction(Sequence::create(mb, callback, NULL));
-	}
-}
-
-//使用怪物技能
-void PlayerPower::useMonsterFire(Vec2 vec2, int flag)
-{
-	if (m_visiable == false)
-	{
-		bindSprite(Sprite::create("Fire.png"));
-		if (flag < 0)
-		{
-			this->getSprite()->setRotationY(-180.0f);
-		}
-		else
-		{
-			this->getSprite()->setRotationY(0.0f);
-		}
-
-		getSprite()->setVisible(true);
-		m_visiable = true;
-
-		this->setPosition(Vec2(vec2.x + 20 * flag, vec2.y));
-
-		auto Func = [&]()
-		{
-			getSprite()->setVisible(false);
-			m_visiable = false;
-		};
-
-		auto mb = MoveBy::create(0.5f, Vec3(400, 0, 0));
-		auto callback = CallFunc::create(Func);
-
-		if (flag < 0)
-			this->runAction(Sequence::create(mb->reverse(), callback, NULL));
-		else
-			this->runAction(Sequence::create(mb, callback, NULL));
-	}
-}
-
-//使用冰冻技能
-void PlayerPower::useIce(Vec2 vec2)
-{
-	if (m_power == NULL)
-	{
-		m_power = Sprite::create("Fire.png");
-		this->addChild(m_power);
-		this->setPosition(Vec2(vec2.x + 20, vec2.y));
-
-		auto Func = [&]()
-		{
-			m_power->removeFromParentAndCleanup(true);
-			m_power = NULL;
-		};
-
-		auto mb = MoveBy::create(1.0f, Vec3(800, 0, 0));
-		auto callback = CallFunc::create(Func);
-		m_power->runAction(Sequence::create(mb, callback, NULL));
-	}
-}
-
-void PlayerPower::useboom(Vec2 vec)
-{
-	if (m_boom == NULL)
-	{
-		m_boom = Sprite::create();
-		m_boom->setPosition(vec);
-		getParent()->addChild(m_boom);
-
-		auto Func1 = [&]()
-		{
-			m_boom->removeAllChildrenWithCleanup(true);
-			m_boom = NULL;
-		};
-
-		auto callback = CallFunc::create(Func1);
-		m_boom->runAction(Sequence::create(boom, callback, NULL));
-	}
-}
-
-int PlayerPower::killMonster2(Vector<Monster* >* monsterList)
+int PlayerPower::singlePowerkillMonster(Vector<Monster* >* monsterList)
 {
 	Rect mrect = this->boundingBox();
 	for (auto ms : *monsterList)
 	{
+		/*float contractX = abs(this->getContentSize().width / 2 + monster->getContentSize().width / 2);
+		float contractY = abs(this->getContentSize().height / 2 + monster->getContentSize().height / 2);
+		float contractDistance = sqrt(contractX * contractX + contractY * contractY);
+
+		float currentX = abs(this->getPosition().x - monster->getPosition().x);
+		float currentY = abs(this->getPosition().y - monster->getPosition().y);
+		float currentDistance = sqrt(currentX * currentX + currentY * currentY);
+
+		if (currentDistance < contractDistance)
+		{
+		monster->hurtMe(getBload());
+
+		std::string boold = StringUtils::format("%d", getBload());
+
+		FlowWord* fw = FlowWord::create();
+		monster->addChild(fw, 20);
+		fw->gettextLab()->setColor(Color3B(255, 0, 0));
+		fw->showWord(boold.c_str(), Vec2(monster->getSprite()->getPosition().x,
+		monster->getSprite()->getPosition().y + monster->getContentSize().height / 2));
+		}*/
 		Rect rect = ms->boundingBox();
 		if (rect.containsPoint(this->getPosition())
 			|| rect.containsPoint(Vec2(this->getPosition().x + this->getContentSize().width / 2, this->getPosition().y))
@@ -237,7 +184,39 @@ int PlayerPower::killMonster2(Vector<Monster* >* monsterList)
 	return 0;
 }
 
-int PlayerPower::killBoss(Boss* boss)
+int PlayerPower::longPowerkillMonster(Vector<Monster* >* monsterList)
+{
+	Rect mrect = this->boundingBox();
+	for (auto ms : *monsterList)
+	{
+		Rect rect = ms->boundingBox();
+		if (rect.containsPoint(this->getPosition())
+			|| rect.containsPoint(Vec2(this->getPosition().x + this->getContentSize().width / 2, this->getPosition().y))
+			|| rect.containsPoint(Vec2(this->getPosition().x - this->getContentSize().width / 2, this->getPosition().y))
+			|| mrect.containsPoint(ms->getPosition()))
+		{
+			// 创建一个 Waved3D 动作
+			//CCActionInterval* waves = CCWaves::create(18, Size(50, 50), 10, 20, true, true);
+			//m_Nodegrid->runAction(waves);
+			int msType = ms->getCharType();
+			NOTIFY->postNotification("ACMonster", (Ref*)&msType);
+
+			ms->hurtMe(getBload());
+
+			std::string boold = StringUtils::format("%d", getBload());
+
+			FlowWord* fw = FlowWord::create();
+			ms->addChild(fw);
+			fw->showWord(boold.c_str(), Vec2(ms->getSprite()->getPosition().x, ms->getSprite()->getPosition().y + ms->getContentSize().height / 2));
+			fw->gettextLab()->setColor(Color3B(255, 0, 0));
+			//CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(StringUtils::format("music/m%d.wav", i % 6).c_str(), false);
+		}
+	}
+
+	return 0;
+}
+
+int PlayerPower::singlePowerkillBoss(Boss* boss)
 {
 	if (boss == nullptr || boss->isDead())
 	{
@@ -254,6 +233,7 @@ int PlayerPower::killBoss(Boss* boss)
 		// 创建一个 Waved3D 动作
 		//CCActionInterval* waves = CCWaves::create(18, Size(50, 50), 10, 20, true, true);
 		//m_Nodegrid->runAction(waves);
+
 		boss->hurtMe(1);
 		FlowWord* fw = FlowWord::create();
 		boss->addChild(fw);
@@ -273,9 +253,14 @@ int PlayerPower::killBoss(Boss* boss)
 	return 0;
 }
 
-void PlayerPower::update(float dt)
+void PlayerPower::singleUpdate(float dt)
 {
-	killMonster2(monsterList);
+	singlePowerkillMonster(monsterList);
 
-	killBoss(boss);
+	singlePowerkillBoss(boss);
+}
+
+void PlayerPower::longUpdate(float dt)
+{
+	longPowerkillMonster(monsterList);
 }

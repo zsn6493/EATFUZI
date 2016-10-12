@@ -28,7 +28,7 @@ public:
 	bool init(Vec2 pt, int level);
 
 	//设置当前技能类型
-	void changeStatus(PowerEnumStatus ps);
+	void changeStatus(CharType ps);
 
 	//游戏逻辑
 	void logic(float dt);
@@ -44,7 +44,7 @@ public:
 private:
 
 	PlayerPower* m_Power;         //技能
-	PowerEnumStatus m_Ps;        //技能类型
+	CharType m_CharType;        //技能类型
 	int m_Destflag;                       //player之前的方向
 	int m_Level;
 };
