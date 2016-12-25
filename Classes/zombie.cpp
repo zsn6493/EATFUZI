@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "zombie.h"
 #include "PartiscEx.h"
 #include "SimpleAudioEngine.h"
 #include "AnimoTool.h"
@@ -6,7 +6,7 @@
 USING_NS_CC;
 using namespace CocosDenshion;
 
-Player::Player(void)
+Zombie::Zombie(void)
 {
 	m_BattleName = "";
 	m_PepLevel = 0;
@@ -22,25 +22,26 @@ Player::Player(void)
 	m_iCurAtkSpeed = 1;
 }
 
-Player::~Player(void)
+Zombie::~Zombie(void)
 {
 	this->unscheduleAllCallbacks();
 }
 
-Player* Player::create(Sprite* sprite)
+Zombie* Zombie::create(Sprite* sprite)
 {
-	Player *player = new Player();
-	if (player && player->init(sprite))
+	Zombie* zombie = new Zombie();
+	if (zombie && zombie->init(sprite))
 	{
-		player->autorelease();
-		return player;
+		zombie->autorelease();
+		return zombie;
 	}
-	CC_SAFE_DELETE(player);
+
+	CC_SAFE_DELETE(zombie);
 
 	return NULL;
 }
 
-bool Player::init(Sprite* sprite)
+bool Zombie::init(Sprite* sprite)
 {
 	bool bRet = false;
 	do
@@ -59,7 +60,7 @@ bool Player::init(Sprite* sprite)
 	return bRet;
 }
 
-void Player::setSpecialName(std::string battleName)
+void Zombie::setSpecialName(std::string battleName)
 {
 	m_BattleName = battleName;
 	auto label = Label::createWithTTF(m_BattleName, "fonts/Marker Felt.ttf", 28);
@@ -68,7 +69,7 @@ void Player::setSpecialName(std::string battleName)
 }
 
 //初始化物理体
-void Player::initPhysicsBody()
+void Zombie::initPhysicsBody()
 {
 	auto playerBody = PhysicsBody::createBox(this->getContentSize(),
 		PHYSICSBODY_MATERIAL_DEFAULT);
@@ -89,13 +90,7 @@ void Player::initPhysicsBody()
 	this->setTag(1);
 }
 
-//player的移动控制
-void Player::movePlayer(int flag)
-{
-	this->setPosition(this->getPositionX() + m_iSpeed * flag, this->getPositionY());
-}
-
-void Player::moveZombie(float dt)
+void Zombie::moveZombie(float dt)
 {
 	int moveType = this->getmoveType();
 	switch (moveType)
@@ -136,6 +131,6 @@ void Player::moveZombie(float dt)
 	}
 }
 
-void Player::updateCallBack(float dt)
+void Zombie::updateCallBack(float dt)
 {
 }

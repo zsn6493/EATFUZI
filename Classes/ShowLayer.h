@@ -67,6 +67,12 @@ public:
 	//怪物逻辑
 	void Monsterlogic(float dt);
 
+	//怪物逻辑
+	void killPlayerlogic(float dt);
+
+	//怪物逻辑
+	void killMonsterlogic(float dt);
+
 	//人物移动动画
 	void movePlayerAnimotion();
 
@@ -86,9 +92,8 @@ public:
 	CC_SYNTHESIZE(PhysicsWorld*, m_World, World);
 	CC_SYNTHESIZE(int, m_MonsterType, MonsterType);
 	//void removeJoint();
-
+	CC_SYNTHESIZE(PlayerManager*, m_PlayerManager, PlayerManager);
 private:
-	PlayerManager*       m_PlayerManager;     //玩家
 	MonsterManager*    m_MonsterManager;  // 怪物
 	BossManager*         m_BossManager;       //Boss
 	GodArmManager*    m_GodArmManager;     //玩家

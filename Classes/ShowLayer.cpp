@@ -3,6 +3,7 @@
 #include "SimpleAudioEngine.h"
 #include "BeginLayer.h"
 #include "AnimoTool.h"
+#include "common.h"
 
 const int PhysicBodyNum = 26;
 
@@ -59,17 +60,6 @@ void  ShowLayer::onEnter()
 	Layer::onEnter();
 }
 
-void randNum()
-{
-	struct timeval now;
-	gettimeofday(&now, NULL);
-
-	//初始化随机种子
-	//timeval是个结构体，里边有俩个变量，一个是以秒为单位的，一个是以微妙为单位的
-	unsigned rand_seed = (unsigned)(now.tv_sec * 1000 + now.tv_usec / 1000);    //都转化为毫秒
-	srand(rand_seed);
-}
-
 /*加载资源*/
 void ShowLayer::loadConfig(int level)
 {
@@ -77,7 +67,7 @@ void ShowLayer::loadConfig(int level)
 	m_Level = level;
 
 	//初始化随机种子
-	randNum();
+	initRandSeed();
 
 	switch (level)
 	{
@@ -102,6 +92,7 @@ void ShowLayer::loadConfig(int level)
 
 			  //创建playerManager
 			  m_PlayerManager = PlayerManager::createWithLevel(Vec2(playerX, playerY + 24), level);
+			  m_PlayerManager->setAnchorPoint(Vec2(0, 0));
 			  m_PlayerManager->setPosition(Vec2(0, 0));
 			  m_Map->addChild(m_PlayerManager, 3);
 
@@ -109,6 +100,7 @@ void ShowLayer::loadConfig(int level)
 			  TMXObjectGroup* mobjGoup = m_Map->getObjectGroup("monsterPoint");
 			  ValueVector monsterPoints = mobjGoup->getObjects();
 
+			  //创建物理环境
 			  PhyscisWorld::createWorld(m_Map, level);
 
 			  //创建monsterManager
@@ -135,11 +127,14 @@ void ShowLayer::loadConfig(int level)
 
 			  m_GodArmManager->runPower();
 
-			  this->schedule(schedule_selector(ShowLayer::Monsterlogic), 0.1f);
+			  this->schedule(schedule_selector(ShowLayer::Monsterlogic), 1 / 20.0f);
+			  this->schedule(schedule_selector(ShowLayer::killPlayerlogic), 0.2f);
+			  this->schedule(schedule_selector(ShowLayer::killMonsterlogic), 0.2f);
 			  this->schedule(schedule_selector(ShowLayer::logic), 1 / 20.0f);
 			  this->schedule(schedule_selector(ShowLayer::Bosslogic), 1.0f);
 			  //认领地图
 			  this->addChild(m_Map, 0, 1);
+			  //CCLOG("PlayerManager %2.2f, %2.2f\n", m_PlayerManager->getPosition().x, m_PlayerManager->getPosition().y);
 	}
 		break;
 	default:
@@ -206,10 +201,12 @@ Point ShowLayer::setViewPoint()
 	auto viewPoint = centerOfView - actualPosition;
 
 	return viewPoint;
+	//return Vec2(0, 0);
 }
 
 void ShowLayer::useZombie(int level)
 {
+	m_CharType = level;
 	m_PlayerManager->useZombie(Vec2(0, 0), m_CharType);
 }
 
@@ -276,7 +273,15 @@ void ShowLayer::Bosslogic(float dt)
 
 void ShowLayer::Monsterlogic(float dt)
 {
-	m_PlayerManager->killMonster(m_MonsterManager->getMonsterList());  //检测是否可以杀死Monster
-	m_MonsterManager->killPlayer(m_PlayerManager->getzombiePtr());  //检测是否可以杀死Player
 	m_MonsterManager->logic();
+}
+
+void ShowLayer::killPlayerlogic(float dt)
+{
+	m_MonsterManager->killPlayer(m_PlayerManager->getzombiePtr());  //检测是否可以杀死Player
+}
+
+void ShowLayer::killMonsterlogic(float dt)
+{
+	m_PlayerManager->killMonster(m_MonsterManager->getMonsterList());  //检测是否可以杀死Monster
 }

@@ -3,6 +3,7 @@
 #include "ui/UIVideoPlayer.h"
 #include "AnimoTool.h"
 #include "HomeScene.h"
+#include "SelectSence.h"
 
 Scene* BeginLayer::createScene()
 {
@@ -61,6 +62,7 @@ void BeginLayer::loadConfig()
 	{
 		m_menu->setVisible(true);
 	};
+
 	CallFunc* callFunc = CallFunc::create(callbackFunc);
 	auto action = AnimoTool::createBeginAnimotion();
 	//sp->runAction(Sequence::create(action, callFunc, NULL));
@@ -69,9 +71,11 @@ void BeginLayer::loadConfig()
 
 void BeginLayer::nextSceneCallback(Ref* pSender)
 {
-	auto scene = MainSence::createScene(3);
+	auto scene = SelectSence::createScene();
+	Director::getInstance()->replaceScene(TransitionFade::create(2.0f, scene));
+	/*auto scene = MainSence::createScene(3);
 	auto layer = scene->getChildByTag(1);
 	MainSence* curlayer = (MainSence*)layer;
 	curlayer->setOriScene(scene);
-	Director::getInstance()->replaceScene(TransitionFade::create(2.0f, scene));
+	Director::getInstance()->replaceScene(TransitionFade::create(2.0f, scene));*/
 }

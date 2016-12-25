@@ -1,38 +1,33 @@
 /*
-	文件名：Monster.h
-	描   述：怪物模型
-	制作人：周司南
-	*/
+文件名：Monster.h
+描   述：怪物模型
+制作人：周司南
+*/
 
-#ifndef _Monster_H_
-#define _Monster_H_
+#ifndef _Monster_Class_Two_H_
+#define _Monster_Class_Two_H_
 
 #include "cocos2d.h"
 #include "Player.h"
 #include "PowerEnum.h"
 #include "PlayerPower.h"
+#include "monsterInterface.h"
 USING_NS_CC;
 
-class Monster : public PSoul
+class MonsterTwo : public PSoul
 {
 public:
-	Monster(void);
-	~Monster(void);
+	MonsterTwo(void);
+	~MonsterTwo(void);
 
 	//创建函数
-	static Monster* create(Sprite* sprite, int ps);
+	static MonsterTwo* create(Sprite* sprite);
 
 	//以图片初始化
 	virtual bool init(Sprite* sprite);
 
 	//AI
 	void simpleAI(Vec2 pPos);
-	void simpleAI2(Vec2 pPos);
-
-	//设置技能类型
-	void changeStatus(CharType ps);
-
-	bool ContainMonsterPower(Player* player);
 
 	void loadConfigure();
 
@@ -59,4 +54,5 @@ private:
 	std::string              m_FileName;            //图片资源路径
 	Rect                      m_Rect;                    //图形显示矩形
 };
+
 #endif

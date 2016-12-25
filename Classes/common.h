@@ -1,15 +1,5 @@
-enum PlayerType
-{
-	Origin = 0,
-	t1,
-	t2,
-	t3,
-};
+#pragma once
 
-enum MonsterType
-{
-	Origin = 0,
-	t1,
-	t2,
-	t3,
-};
+#include "cocos2d.h"
+
+void initRandSeed();

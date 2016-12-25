@@ -1,15 +1,12 @@
 #include "Boss.h"
 #include "SimpleAudioEngine.h"
 #include "AnimoTool.h"
-
 USING_NS_CC;
-using namespace CocosDenshion;
 
 #define NOTIFY cocos2d::NotificationCenter::getInstance()
 
 Boss::Boss(void)
 {
-	m_MonsterPower = NULL;
 	scheduleUpdate();
 }
 
@@ -38,15 +35,8 @@ bool Boss::init(Sprite* sprite)
 		CC_BREAK_IF(!sprite);
 		bindSprite(sprite);
 
-		if (m_CharType == t1)
-		{
-			this->schedule(schedule_selector(Boss::updatCallBack));
-		}
-		else if (m_CharType == t2)
-		{
-			//auto action = AnimoTool::createBoss2Animotion();
-			//sprite->runAction(action);
-		}
+		this->schedule(schedule_selector(Boss::updatCallBack));
+
 		bRet = true;
 	} while (0);
 
@@ -56,21 +46,15 @@ bool Boss::init(Sprite* sprite)
 /*¹ÖÎïAI*/
 void Boss::simpleAI(Vec2 pPos)
 {
-	if (m_CharType == t1)
+	if (this->getPosition().x <= 0)
 	{
-		if (this->getPosition().x <= 0)
-		{
-			hurtMe(100);
-		}
-		else
-		{
-			//auto jb = JumpBy::create(0.5, Vec2(-10, 30), 30, 1);
-			//auto mb = MoveBy::create(0.5, Vec3(-1, 0, 0));
-			//this->runAction(mb);
-		}
+		hurtMe(100);
 	}
-	else if (m_CharType == t2)
+	else
 	{
+		//auto jb = JumpBy::create(0.5, Vec2(-10, 30), 30, 1);
+		//auto mb = MoveBy::create(0.5, Vec3(-1, 0, 0));
+		//this->runAction(mb);
 	}
 }
 

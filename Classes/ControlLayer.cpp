@@ -19,6 +19,8 @@ int pressTimes = 0;
 
 int touchCounts = 0;
 
+const int MAX_BLOOD_NUM = 3;
+
 Scene* ControlLayer::createScene()
 {
 	//创建物理场景
@@ -33,11 +35,13 @@ ControlLayer::ControlLayer()
 	m_longProgress = false;
 	m_LongTouchLabel = nullptr;
 	m_Target = nullptr;
-	m_LabelCount = 0;
+	m_LabelCount = 1;
+	m_MonsterBloodNum = 0;
 }
 
 ControlLayer::~ControlLayer()
 {
+	NOTIFY->removeAllObservers(this);
 }
 
 ControlLayer* ControlLayer::create(Layer* layer)
@@ -69,12 +73,17 @@ bool ControlLayer::init(Layer* layer)
 
 	loadConfig();                                                 //加载资源
 
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
 	m_LongTouchLabel = Node::create();
 	m_LongTouchLabel->setPosition(Vec2(0, 0));
 	this->addChild(m_LongTouchLabel);
+
+	//加载特殊进度条/*需要优化*/
+	SpecialProgress(m_LongTouchLabel);
+
+	Vec2 originPt = this->m_viewLayer->getPlayerManager()->getOriginPoint();
+
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	//临时加载一个返回选择界面的按钮
 	auto closeItem = MenuItemImage::create(
@@ -108,8 +117,8 @@ bool ControlLayer::init(Layer* layer)
 		"CloseSelected.png",
 		CC_CALLBACK_1(ControlLayer::usePowerUp, this));
 
-	powerUp->setPosition(Vec2(origin.x + closeItem->getContentSize().width,
-		200));
+	powerUp->setPosition(Vec2(originPt.x - 25,
+		originPt.y));
 
 	auto powerUpMenu = Menu::create(powerUp, NULL);
 	powerUpMenu->setPosition(Vec2::ZERO);
@@ -121,8 +130,8 @@ bool ControlLayer::init(Layer* layer)
 		"CloseSelected.png",
 		CC_CALLBACK_1(ControlLayer::usePeoUp, this));
 
-	peoUp->setPosition(Vec2(origin.x + closeItem->getContentSize().width,
-		100));
+	peoUp->setPosition(Vec2(originPt.x + 75,
+		originPt.y));
 
 	auto peoUpMenu = Menu::create(peoUp, NULL);
 	peoUpMenu->setPosition(Vec2::ZERO);
@@ -133,11 +142,11 @@ bool ControlLayer::init(Layer* layer)
 	m_Target->setVisible(false);
 	this->addChild(m_Target);
 
-	////订阅切换失败场景
-	//NOTIFY->addObserver(this,
-	//	callfuncO_selector(ControlLayer::loseBlood),
-	//	"LOSEBLOOD",
-	//	NULL);
+	//订阅切换失败场景
+	NOTIFY->addObserver(this,
+		callfuncO_selector(ControlLayer::loseBlood),
+		"LOSEBLOOD",
+		NULL);
 
 	//订阅切换失败场景
 	NOTIFY->addObserver(this,
@@ -145,6 +154,11 @@ bool ControlLayer::init(Layer* layer)
 		"ACMonster",
 		NULL);
 
+	return true;
+}
+
+void ControlLayer::SpecialProgress(Node* node)
+{
 	for (int i = 1; i <= 5; i++)
 	{
 		switch (i)
@@ -203,8 +217,6 @@ bool ControlLayer::init(Layer* layer)
 			break;
 		}
 	}
-
-	return true;
 }
 
 //初始化加载资源
@@ -240,7 +252,6 @@ void ControlLayer::onTouchesBegan(const std::vector<Touch*>& touches, cocos2d::E
 	{
 		//使用技能
 		auto location = touch->getLocation();
-		//m_viewLayer->useFZPower(location);
 
 		m_startPoint = touch->getLocation();
 
@@ -248,7 +259,6 @@ void ControlLayer::onTouchesBegan(const std::vector<Touch*>& touches, cocos2d::E
 
 		m_startTime = getCurrentTime();
 
-		//m_Target->setVisible(true);
 		m_Target->setPosition(touch->getLocation());
 		//处理长按事件
 		this->schedule(schedule_selector(ControlLayer::updatelongprogress), 0.5);
@@ -262,19 +272,8 @@ void ControlLayer::onTouchesMoved(const std::vector<Touch*>& touches, cocos2d::E
 	{
 		if (m_longProgress)
 		{
-			//m_Target->setVisible(true);
 			m_Target->setPosition(touch->getLocation());
 		}
-		//m_viewLayer->removeJoint();
-		/*
-		m_Count++;
-		if (m_Count % 10 == 0)
-		{
-		auto location = touch->getLocation();
-		m_viewLayer->useFZPower(location);
-
-		m_Count = 1;
-		}*/
 	}
 }
 
@@ -290,26 +289,17 @@ void ControlLayer::onTouchesEnded(const std::vector<Touch*>& touches, cocos2d::E
 		this->unschedule(schedule_selector(ControlLayer::updatelongprogress));
 
 		//如果刚完成长按事件 则把按下次数清零 长按状态置空 直接返回 不继续执行
-		if (m_longProgress) {
+		if (m_longProgress)
+		{
 			touchCounts = 0;
 			m_longProgress = false;
-
 			m_viewLayer->useLongPower(location);
 			return;
 		}
 
 		m_endPoint = touch->getLocation();
-
 		long long endTime = getCurrentTime();
-
 		long long timeDis = endTime - m_startTime;
-
-		//E_SWIP_DIR dir = GetSwipDir(m_startPoint, m_endPoint, timeDis);
-
-		//if (dir != E_INVAILD) {
-		//onSwip(m_startPoint, m_endPoint, dir);
-		//return;
-		//}
 
 		//做连击判断
 		if (isMoved)
@@ -345,7 +335,7 @@ void ControlLayer::gameOverCallback(Ref* pSender)
 //使用技能
 void ControlLayer::usePower1(Ref* pSender)
 {
-	m_viewLayer->useZombie(1);
+	m_viewLayer->useZombie(m_LabelCount);
 }
 
 void ControlLayer::usePowerUp(Ref* pSender)
@@ -380,6 +370,13 @@ void ControlLayer::usePeoUp(Ref* pSender)
 
 	m_viewLayer->setcharType(m_viewLayer->getcharType() + 1);
 	NOTIFY->postNotification("DeNum", (Ref*)&s);
+
+	if (m_LabelCount <= 5)
+	{
+		m_LongTouchLabel->getChildByTag(m_LabelCount)->setVisible(true);
+	}
+
+	++m_LabelCount;
 }
 
 //update function
@@ -411,15 +408,15 @@ void ControlLayer::updateDoubleDelay(float ft)
 
 void ControlLayer::updatelongprogress(float ft)
 {
-	if (isTouch) {
+	if (isTouch)
+	{
 		pressTimes++;
 
-		if (pressTimes >= 2) {
+		if (pressTimes >= 2)
+		{
 			m_longProgress = true;
-
 			m_Target->setVisible(true);
 			//onLongPressed();
-			//m_viewLayer->removeJoint();
 		}
 	}
 	else
@@ -439,9 +436,29 @@ void ControlLayer::activeMonster(Ref* pData)
 {
 	static int i = 0;
 	int data = *(int*)pData;
-	if (data > 0)
-	{
-		m_LongTouchLabel->getChildByTag(data)->setVisible(true);
-	}
 	m_viewLayer->setMonsterType(data);
+
+	if (m_LabelCount <= 5)
+	{
+		m_LongTouchLabel->getChildByTag(m_LabelCount)->setVisible(true);
+	}
+	++m_LabelCount;
+}
+
+void ControlLayer::loseBlood(Ref* pData)
+{
+	int currentData = m_pProgressView->getCurrentProgress() - *(int*)pData;
+	if (currentData <= 0)
+	{
+		m_pProgressView->setForegroundTexture("bloodBar/hr_slider.png");
+		m_pProgressView->getProgressForeground()->setColor(Color3B(100, 100, 100));
+		m_pProgressView->setCurrentProgress(100.0f);
+		++m_MonsterBloodNum;
+		if (m_MonsterBloodNum >= MAX_BLOOD_NUM)
+		{
+			m_viewLayer->retBeginLayer();
+		}
+		return;
+	}
+	m_pProgressView->setCurrentProgress(currentData);
 }

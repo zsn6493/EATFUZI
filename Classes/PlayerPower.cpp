@@ -53,18 +53,12 @@ bool PlayerPower::initWithFileSp(Sprite* sprite, int powerNum, int bloodValue)
 	do
 	{
 		CC_BREAK_IF(!sprite);
-		//this->setPosition(sp->getPosition());
+
 		bindSprite(sprite);    //绑定sprite到成员函数
-		bRet = true;
-
-		//auto sp = Sprite::create("Arm.png");
-		//m_Nodegrid = NodeGrid::create();
-
-		//this->addChild(m_Nodegrid, 1);
 
 		if (powerNum == 0)
 		{
-			this->schedule(schedule_selector(PlayerPower::singleUpdate), 0.2f);
+			this->schedule(schedule_selector(PlayerPower::singleUpdate), 0.05f);
 			this->scheduleOnce(schedule_selector(PlayerPower::updateCallBack), 0.7f);
 		}
 		else if (powerNum == 1)
@@ -72,6 +66,8 @@ bool PlayerPower::initWithFileSp(Sprite* sprite, int powerNum, int bloodValue)
 			this->schedule(schedule_selector(PlayerPower::longUpdate), 0.2f);
 			this->scheduleOnce(schedule_selector(PlayerPower::updateCallBack), 0.5f);
 		}
+
+		bRet = true;
 	} while (0);
 
 	scheduleUpdate();
@@ -104,80 +100,36 @@ void PlayerPower::updateCallBack(float dt)
 	this->removeFromParentAndCleanup(true);
 }
 
-////使用火焰技能
-//void PlayerPower::useFire(Vec2 vec2)
-//{
-//	if (m_visiable == false)
-//	{
-//		if (getSprite() == NULL)
-//		{
-//			bindSprite(Sprite::create("Fire.png"));
-//		}
-//		else
-//		{
-//			getSprite()->setVisible(true);
-//			m_visiable = true;
-//		}
-//
-//		this->setAnchorPoint(Vec2(1.0f, 0.5f));
-//		this->setPosition(Vec2(vec2.x + 20, vec2.y));
-//
-//		auto Func = [&]()
-//		{
-//			getSprite()->setVisible(false);
-//			m_visiable = false;
-//		};
-//
-//		auto mb = MoveBy::create(1.0f, Vec3(800, 0, 0));
-//		auto callback = CallFunc::create(Func);
-//		this->runAction(Sequence::create(mb, callback, NULL));
-//	}
-//}
-
 int PlayerPower::singlePowerkillMonster(Vector<Monster* >* monsterList)
 {
 	Rect mrect = this->boundingBox();
 	for (auto ms : *monsterList)
 	{
-		/*float contractX = abs(this->getContentSize().width / 2 + monster->getContentSize().width / 2);
-		float contractY = abs(this->getContentSize().height / 2 + monster->getContentSize().height / 2);
+		CCLOG("point: x: %2.2f, y: %2.2f\n", this->getPositionX(), this->getPositionY());
+		CCLOG("ms: x: %2.2f, y: %2.2f\n", ms->getPositionX(), ms->getPositionY());
+
+		float contractX = abs(this->getContentSize().width / 2
+			+ ms->getContentSize().width / 2);
+		float contractY = abs(this->getContentSize().height / 2
+			+ ms->getContentSize().height / 2);
 		float contractDistance = sqrt(contractX * contractX + contractY * contractY);
 
-		float currentX = abs(this->getPosition().x - monster->getPosition().x);
-		float currentY = abs(this->getPosition().y - monster->getPosition().y);
+		float currentX = abs(this->getPosition().x - ms->getPosition().x);
+		float currentY = abs(this->getPosition().y - ms->getPosition().y);
 		float currentDistance = sqrt(currentX * currentX + currentY * currentY);
 
 		if (currentDistance < contractDistance)
 		{
-		monster->hurtMe(getBload());
-
-		std::string boold = StringUtils::format("%d", getBload());
-
-		FlowWord* fw = FlowWord::create();
-		monster->addChild(fw, 20);
-		fw->gettextLab()->setColor(Color3B(255, 0, 0));
-		fw->showWord(boold.c_str(), Vec2(monster->getSprite()->getPosition().x,
-		monster->getSprite()->getPosition().y + monster->getContentSize().height / 2));
-		}*/
-		Rect rect = ms->boundingBox();
-		if (rect.containsPoint(this->getPosition())
-			|| rect.containsPoint(Vec2(this->getPosition().x + this->getContentSize().width / 2, this->getPosition().y))
-			|| rect.containsPoint(Vec2(this->getPosition().x - this->getContentSize().width / 2, this->getPosition().y))
-			|| mrect.containsPoint(ms->getPosition()))
-		{
-			// 创建一个 Waved3D 动作
-			//CCActionInterval* waves = CCWaves::create(18, Size(50, 50), 10, 20, true, true);
-			//m_Nodegrid->runAction(waves);
-
 			ms->hurtMe(getBload());
 
 			std::string boold = StringUtils::format("%d", getBload());
 
 			FlowWord* fw = FlowWord::create();
-			ms->addChild(fw);
-			fw->showWord(boold.c_str(), Vec2(ms->getSprite()->getPosition().x, ms->getSprite()->getPosition().y + ms->getContentSize().height / 2));
+			ms->addChild(fw, 20);
 			fw->gettextLab()->setColor(Color3B(255, 0, 0));
-			//CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(StringUtils::format("music/m%d.wav", i % 6).c_str(), false);
+			fw->showWord(boold.c_str(), Vec2(ms->getSprite()->getPosition().x,
+				ms->getSprite()->getPosition().y +
+				ms->getContentSize().height / 2));
 		}
 	}
 
@@ -195,16 +147,13 @@ int PlayerPower::longPowerkillMonster(Vector<Monster* >* monsterList)
 			|| rect.containsPoint(Vec2(this->getPosition().x - this->getContentSize().width / 2, this->getPosition().y))
 			|| mrect.containsPoint(ms->getPosition()))
 		{
-			// 创建一个 Waved3D 动作
-			//CCActionInterval* waves = CCWaves::create(18, Size(50, 50), 10, 20, true, true);
-			//m_Nodegrid->runAction(waves);
+			//伤害处理
 			int msType = ms->getCharType();
+			ms->hurtMe(getBload());
 			NOTIFY->postNotification("ACMonster", (Ref*)&msType);
 
-			ms->hurtMe(getBload());
-
+			//伤害显示
 			std::string boold = StringUtils::format("%d", getBload());
-
 			FlowWord* fw = FlowWord::create();
 			ms->addChild(fw);
 			fw->showWord(boold.c_str(), Vec2(ms->getSprite()->getPosition().x, ms->getSprite()->getPosition().y + ms->getContentSize().height / 2));

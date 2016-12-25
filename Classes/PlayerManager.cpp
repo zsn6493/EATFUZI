@@ -5,6 +5,7 @@
 #include "AnimoTool.h"
 #include "FlowWord.h"
 #include "PartiscEx.h"
+#include "common.h"
 
 PlayerManager::PlayerManager()
 {
@@ -43,8 +44,34 @@ bool PlayerManager::init(Vec2 pt, int level)
 	//模拟默认类型
 	m_CharType = CharType::Origin;
 
+	//初始化人物图片的资源
+	initPlayerPic(CharType::Origin);
+
+	//创建player
+	m_Player = Player::create(Sprite::create(m_FileName, m_Rect));
+	m_Player->setAnchorPoint(Vec2(0.5, 0.5));
+	m_Player->setPosition(Vec2(pt.x + m_Player->getContentSize().width / 2, pt.y + m_Player->getContentSize().height / 2));
+	this->addChild(m_Player, 1);
+
+	//设置player称号
+	m_Player->setSpecialName("MHunter");
+
+	//保存zombie容器指针
+	this->setzombiePtr(&m_zombieVector);
+
+	//初始化随机种子
+	initRandSeed();
+
+	//zombie的移动逻辑控制
+	this->schedule(schedule_selector(PlayerManager::controlAction), 0.2f);
+
+	return true;
+}
+
+void PlayerManager::initPlayerPic(CharType charType)
+{
 	//判断人物类型 关联不同资源
-	switch (m_CharType)
+	switch (charType)
 	{
 	case Origin:
 		m_FileName = NEWTYPE_ONE;
@@ -67,78 +94,32 @@ bool PlayerManager::init(Vec2 pt, int level)
 		m_Rect = NEWTYPE_ONE_RECT;
 		break;
 	}
-
-	//创建player
-	m_Player = Player::create(Sprite::create(m_FileName, m_Rect));
-	m_Player->setAnchorPoint(Vec2(0.5, 0.5));
-	m_Player->setPosition(Vec2(pt.x + m_Player->getContentSize().width / 2, pt.y + m_Player->getContentSize().height / 2));
-	this->addChild(m_Player, 1);
-
-	m_Player->setSpecialName("MHunter");
-
-	this->setzombiePtr(&m_zombieVector);
-
-	struct timeval now;
-	gettimeofday(&now, NULL);
-
-	//初始化随机种子
-	//timeval是个结构体，里边有俩个变量，一个是以秒为单位的，一个是以微妙为单位的
-	unsigned rand_seed = (unsigned)(now.tv_sec * 1000 + now.tv_usec / 1000);    //都转化为毫秒
-	srand(rand_seed);
-
-	this->schedule(schedule_selector(PlayerManager::controlAction), 0.5f);
-
-	return true;
 }
 
 void PlayerManager::startPlayerMoveAction()
 {
-	if (CharType::Origin == m_CharType)
-	{
-		auto right = AnimoTool::newTypeOneRightMoveAnimotion();
-		m_Player->getSprite()->runAction(right);
-	}
-	else if (m_CharType == t2)
-	{
-	}
+	//if (CharType::Origin == m_CharType)
+	//{
+	//	auto right = AnimoTool::newTypeOneRightMoveAnimotion();
+	//	m_Player->getSprite()->runAction(right);
+	//}
+	//else if (m_CharType == t2)
+	//{
+	//}
 }
 
 void PlayerManager::stopPlayerAction()
 {
-	if (m_CharType == CharType::Origin)
-	{
-		m_Player->getSprite()->stopAllActions();
-		m_Player->bindSprite(Sprite::create(m_FileName, m_Rect));
-	}
+	//if (m_CharType == CharType::Origin)
+	//{
+	//	m_Player->getSprite()->stopAllActions();
+	//	m_Player->bindSprite(Sprite::create(m_FileName, m_Rect));
+	//}
 }
 
 /*移动player*/
 void PlayerManager::movePlayer(int flag)
 {
-	//if (m_Player->getPositionX() - m_Player->getContentSize().width / 2 <= 0 && flag == -1)
-	//{
-	//	m_Player->setPositionX(m_Player->getContentSize().width / 2);
-	//}
-	//else  if (m_Player->getPositionX() + m_Player->getContentSize().width / 2 >= 1600 && flag == 1)
-	//{
-	//	m_Player->setPositionX(1600 - m_Player->getContentSize().width / 2);
-	//}
-	//else
-	//{
-	//	if (m_Destflag != flag && flag != 0)
-	//	{
-	//		if (flag < 0)
-	//			m_Player->setRotationY(-180);
-	//		else
-	//			m_Player->setRotationY(0);
-	//	}
-
-	//	if (flag != 0)
-	//		this->m_Destflag = flag;
-
-	//	m_Player->movePlayer(flag);
-	//}
-
 	return;
 }
 
@@ -148,71 +129,81 @@ Player* PlayerManager::getPlayer()
 	return this->m_Player;
 }
 
-void PlayerManager::useSinglePower(Vec2 pt, Vector<Monster* >* monsterList, Boss* boss, bool firePower)
+BezierTo* PlayerManager::bezierAction(Vec2 first, Vec2 last, int radian)
 {
-	auto power = PlayerPower::createSp(Sprite::create("Arm4.png"), 0, CCRANDOM_0_1() * this->getHurtValue());
-	auto winSize = Director::getInstance()->getWinSize();
-
-	power->setFirePower(firePower);
-	power->setAnchorPoint(Vec2(0.5f, 0.5f));
-
-	Vec2 playerPt = getPlayer()->getPosition();
-
-	power->setPosition(Vec2(playerPt.x, playerPt.y - 50));
-	auto rb = RotateBy::create(0.5f, 360 * 2);
-
-	float radian = 30 * 3.14159 / 180.0;
+	float r = radian * 3.14159 / 180.0;
 	// 第一个控制点为抛物线左半弧的中点
-	float q1x = playerPt.x + (pt.x - playerPt.x) / 4.0;
-	Point q1 = ccp(q1x, 100 + playerPt.y + cos(radian)*q1x);
+	float q1x = first.x + (last.x - first.x) / 4.0;
+	Point q1 = ccp(q1x, 100 + first.y + cos(r)*q1x);
 
-	// 第二个控制点为整个抛物线的中点
-	float q2x = playerPt.x + (pt.x - playerPt.x) / 2.0;
-	Point q2 = ccp(q2x, 100 + playerPt.y + cos(radian)*q2x);
+	float q2x = first.x + (last.x - first.x) / 2.0;
+	Point q2 = ccp(q2x, 100 + first.y + cos(r)*q2x);
 
 	ccBezierConfig bezier;
 	bezier.controlPoint_1 = q1;
 	bezier.controlPoint_2 = q2;
 	bezier.endPosition.y = 100;
-	bezier.endPosition.x = pt.x + pt.y - 100;
-
+	bezier.endPosition.x = last.x + last.y - 100;
+	//bezier.endPosition.y = pt.y;
+	//bezier.endPosition.x = pt.x;
 	//创建BezierTo动作对象
 	auto bezierTo = BezierTo::create(0.5f, bezier);
-	power->runAction(Spawn::create(bezierTo, rb, NULL));
-	power->monsterList = monsterList;
 
+	return 	bezierTo;
+}
+
+void PlayerManager::useSinglePower(Vec2 pt, Vector<Monster*>* monsterList,
+	Boss* boss,
+	bool firePower)
+{
+	//创建武器
+	auto power = PlayerPower::createSp(Sprite::create("Arm4.png"), 0, CCRANDOM_0_1() * this->getHurtValue());
+	auto winSize = Director::getInstance()->getWinSize();
+
+	/* 武器动作模式*/
+	Vec2 playerPt = getPlayer()->getPosition();
+	power->setFirePower(firePower);
+	power->setAnchorPoint(Vec2(0.5f, 0.5f));
+	power->setPosition(Vec2(playerPt.x, playerPt.y - 50));
+
+	//武器弧度
+	auto bezierTo = bezierAction(playerPt, pt, 30);
+
+	//武器旋转
+	auto rb = RotateBy::create(0.5f, 360 * 2);
+	power->runAction(Spawn::create(bezierTo, rb, NULL));
+
+	/*需改进To do*/
+	power->monsterList = monsterList;
 	power->boss = boss;
 
+	//CCLOG("power %2.2f, %2.2f\n", power->getPosition().x, power->getPosition().y);
 	this->addChild(power);
 }
 
 void PlayerManager::useLongPower(Vec2 pt, Vector<Monster* >* monsterList, Boss* boss)
 {
-	auto power = PlayerPower::createSp(Sprite::create("Arm1.png"), 1, 1000);
-
+	//创建武器
 	Vec2 playerPt = getPlayer()->getPosition();
+	auto power = PlayerPower::createSp(Sprite::create("Arm1.png"), 1, 1000);
+	power->setAnchorPoint(Vec2(0.5f, 0.5f));
 	power->setPosition(playerPt);
 
+	//执行动作模式
 	auto mb = MoveTo::create(0.4, pt);
 	CCEaseBackIn* backIn = CCEaseBackIn::create(dynamic_cast<CCActionInterval *>(mb));
 	power->runAction(backIn);
 
-	power->setAnchorPoint(Vec2(0.5f, 0.5f));
-
+	/*需改进To do*/
 	power->monsterList = monsterList;
 	power->boss = boss;
 
 	this->addChild(power);
 }
 
-void PlayerManager::useZombie(Vec2 pt, int level)
+void PlayerManager::setZombieColor(int index, Player* zombie)
 {
-	auto zombie = Player::create(Sprite::create(m_FileName, m_Rect));
-	zombie->setAnchorPoint(Vec2(0.5f, 0.5f));
-	zombie->setPosition(getPlayer()->getPosition());
-
-	int r = rand() % level;
-	switch (r)
+	switch (index)
 	{
 	case 1:
 	{
@@ -241,11 +232,29 @@ void PlayerManager::useZombie(Vec2 pt, int level)
 			  break;
 	}
 	default:
-		break;
+	{
+			   break;
 	}
+	}
+}
 
-	zombie->setmoveType(r);
-	zombie->setiHP(100);
+void PlayerManager::useZombie(Vec2 pt, int level)
+{
+	auto zombie = Player::create(Sprite::create(m_FileName, m_Rect));
+	zombie->setAnchorPoint(Vec2(0.5f, 0.5f));
+	zombie->setPosition(getPlayer()->getPosition());
+
+	//随机值zomRandIndex代表zombie类型（种类）
+	int zomRandIndex = rand() % level;
+
+	//设置zombie的外表颜色
+	setZombieColor(zomRandIndex, zombie);
+
+	//设置zombie的移动方式
+	zombie->setmoveType(zomRandIndex);
+
+	//设置zombie的血量
+	zombie->setiHP(1000);
 	this->addChild(zombie);
 
 	m_zombieVector.pushBack(zombie);
@@ -267,22 +276,36 @@ int PlayerManager::killMonster(Vector<Monster*>* monsterList)
 		for (auto monster : *monsterList)
 		{
 			float contractX = zombie->getContentSize().width / 2 + monster->getContentSize().width / 2;
-			float contractY = zombie->getContentSize().height / 2 + monster->getContentSize().height / 2;
+			float contractY = abs(zombie->getContentSize().height / 2 - monster->getContentSize().height / 2);
 			float contractDistance = sqrt(contractX * contractX + contractY * contractY);
 
 			float currentX = abs(zombie->getPosition().x - monster->getPosition().x);
 			float currentY = abs(zombie->getPosition().y - monster->getPosition().y);
 			float currentDistance = sqrt(currentX * currentX + currentY * currentY);
 
-			if (currentDistance <= contractDistance / 2)
+			if (currentDistance <= contractDistance)
 			{
 				zombie->setmoveStatus(false);
-				monster->setAcceptBlood(CCRANDOM_0_1() * this->getHurtValue());
+				//monster->setAcceptBlood(CCRANDOM_0_1() * zombie->getiCurAtk());
+				int temp = (monster->getiBaseAtk() + monster->getiCurAtk() - zombie->getiDefens());
+				zombie->hurtMe(temp);
+
+				std::string blood = StringUtils::format("%d", temp);
+				FlowWord* flowWord = FlowWord::create();
+				flowWord->showWord(blood.c_str(), Vec2(zombie->getSprite()->getPosition().x, zombie->getSprite()->getPosition().y + zombie->getContentSize().height / 2));
+				flowWord->gettextLab()->setColor(Color3B(255, 0, 0));
+				zombie->setmoveStatus(false);
+				zombie->addChild(flowWord);
 			}
 			else
 			{
 				zombie->setmoveStatus(true);
 			}
+		}
+
+		if (monsterList->empty())
+		{
+			zombie->setmoveStatus(true);
 		}
 	}
 
@@ -295,13 +318,14 @@ void PlayerManager::controlAction(float dt)
 	{
 		if (zombie->getmoveStatus())
 		{
-			zombie->scheduleOnce(schedule_selector(Player::moveZombie), 0.2f);
+			zombie->scheduleOnce(schedule_selector(Player::moveZombie), 0.1f);
 
 			if (zombie->getstartMoveAction() == false)
 			{
 				zombie->setstartMoveAction(true);
 				zombie->setstartFightAciton(false);
 				zombie->getSprite()->stopActionByTag(101);
+				//zombie运动动画
 				auto action = AnimoTool::newTypeOneRightMoveAnimotion();
 				action->setTag(100);
 				zombie->getSprite()->runAction(action);
@@ -314,17 +338,11 @@ void PlayerManager::controlAction(float dt)
 				zombie->setstartFightAciton(true);
 				zombie->setstartMoveAction(false);
 				zombie->getSprite()->stopActionByTag(100);
+				//zombie运动动画
 				auto action = AnimoTool::newTypeOneAttactAnimotion();
 				action->setTag(101);
 				zombie->getSprite()->runAction(action);
 			}
-
-			zombie->hurtMe(1);
-			FlowWord* flowWord = FlowWord::create();
-			flowWord->showWord("-1", Vec2(zombie->getSprite()->getPosition().x, zombie->getSprite()->getPosition().y + zombie->getContentSize().height / 2));
-			flowWord->gettextLab()->setColor(Color3B(255, 0, 0));
-			zombie->setmoveStatus(false);
-			zombie->addChild(flowWord);
 		}
 	}
 }
@@ -336,7 +354,97 @@ void PlayerManager::jumpPlayer()
 	m_Player->getPhysicsBody()->setVelocity(Vect(150, 500));
 }
 
-/*英雄逻辑*/
+/*死亡后的效果*/
+void PlayerManager::runPlayerDeadPower(Player* zombie)
+{
+	if (zombie->getmoveType() == 1)
+	{
+		PartiscEx* pe = PartiscEx::create();
+		pe->PlayExplosion(zombie->getPosition());
+		this->getParent()->addChild(pe, 3);
+	}
+
+	if (zombie->getmoveType() == 0)
+	{
+		//攻击力加成
+		int hurtValue = this->getHurtValue();
+		setHurtValue(++hurtValue);
+		for (auto zombie : m_zombieVector)
+		{
+			FlowWord* flowWord = FlowWord::create();
+			flowWord->showWord("+1", Vec2(zombie->getSprite()->getPosition().x, zombie->getSprite()->getPosition().y + zombie->getContentSize().height / 2));
+			flowWord->gettextLab()->setColor(Color3B(0, 255, 0));
+			zombie->addChild(flowWord);
+			int count = zombie->getiCurAtk();
+			zombie->setiCurAtk(++count);
+		}
+	}
+	else if (zombie->getmoveType() == 1)
+	{
+		//防御力加成
+		Color3B color3b = zombie->getSprite()->getColor();
+		for (auto zombie : m_zombieVector)
+		{
+			FlowWord* flowWord = FlowWord::create();
+			flowWord->showWord("+1", Vec2(zombie->getSprite()->getPosition().x, zombie->getSprite()->getPosition().y + zombie->getContentSize().height / 2));
+			flowWord->gettextLab()->setColor(color3b);
+			zombie->addChild(flowWord);
+
+			int count = zombie->getiDefens();
+			zombie->setiDefens(++count);
+		}
+	}
+	else if (zombie->getmoveType() == 2)
+	{
+		//HP加成
+		Color3B color3b = zombie->getSprite()->getColor();
+		for (auto zombie : m_zombieVector)
+		{
+			FlowWord* flowWord = FlowWord::create();
+			flowWord->showWord("+1", Vec2(zombie->getSprite()->getPosition().x,
+				zombie->getSprite()->getPosition().y + zombie->getContentSize().height / 2));
+			flowWord->gettextLab()->setColor(color3b);
+			zombie->addChild(flowWord);
+
+			int count = zombie->getiHP();
+			zombie->setiHP(++count);
+		}
+	}
+	else if (zombie->getmoveType() == 3)
+	{
+		//速度加成
+		Color3B color3b = zombie->getSprite()->getColor();
+		for (auto zombie : m_zombieVector)
+		{
+			FlowWord* flowWord = FlowWord::create();
+			flowWord->showWord("+1", Vec2(zombie->getSprite()->getPosition().x,
+				zombie->getSprite()->getPosition().y + zombie->getContentSize().height / 2));
+			flowWord->gettextLab()->setColor(color3b);
+			zombie->addChild(flowWord);
+
+			int count = zombie->getiSpeed();
+			zombie->setiSpeed(++count);
+		}
+	}
+	else if (zombie->getmoveType() == 4)
+	{
+		//攻击速度加成
+		Color3B color3b = zombie->getSprite()->getColor();
+		for (auto zombie : m_zombieVector)
+		{
+			FlowWord* flowWord = FlowWord::create();
+			flowWord->showWord("+1", Vec2(zombie->getSprite()->getPosition().x,
+				zombie->getSprite()->getPosition().y + zombie->getContentSize().height / 2));
+			flowWord->gettextLab()->setColor(color3b);
+			zombie->addChild(flowWord);
+
+			int count = zombie->getiAtkSpeed();
+			zombie->setiAtkSpeed(++count);
+		}
+	}
+}
+
+/*zombie死亡释放处理*/
 void PlayerManager::logic()
 {
 	for (auto zombie : m_zombieVector)
@@ -349,13 +457,7 @@ void PlayerManager::logic()
 
 		if (zombie->isDead())
 		{
-			if (zombie->getmoveType() == 1)
-			{
-				PartiscEx* pe = PartiscEx::create();
-				pe->PlayExplosion(zombie->getPosition());
-				this->getParent()->addChild(pe, 3);
-			}
-
+			runPlayerDeadPower(zombie);
 			zombie->removeFromParentAndCleanup(true);
 			m_zombieVector.eraseObject(zombie);
 			break;

@@ -14,6 +14,7 @@ Scene* MainSence::createScene(int level)
 	world->setGravity(Vect(0, -2000));
 	world->setAutoStep(false);
 
+	//调试物理世界的轮廓
 	world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
 
 	//创建展示层
@@ -63,25 +64,26 @@ MainSence* MainSence::create(int level)
 
 bool MainSence::init(int level)
 {
-	//super init first
+	//父类初始化
 	if (!Layer::init())
 	{
 		return false;
 	}
 
-	//update func
+	//update循环
 	scheduleUpdate();
 
-	//backgrand layer
+	//背景层
 	m_BackGrandLayer = Layer::create();
 	this->addChild(m_BackGrandLayer);
 
+	//显示杀敌得分
 	auto winSize = Director::getInstance()->getWinSize();
 	m_Label = Label::createWithTTF(StringUtils::format("%d", m_KillMonsterNum), "fonts/Marker Felt.ttf", 52);
-	m_Label->setPosition(Vec2(winSize.width / 2, winSize.height - 50));
+	m_Label->setPosition(Vec2(100, winSize.height / 2 + 50));
 	m_BackGrandLayer->addChild(m_Label, 2);
 
-	//select backGrand
+	//根据关卡级别控制背景（to mod)
 	switch (level)
 	{
 	case 1:
@@ -99,25 +101,25 @@ bool MainSence::init(int level)
 		break;
 	}
 
-	//订阅切换胜利场景
-	NOTIFY->addObserver(this,
-		callfuncO_selector(MainSence::killedMonsterNum),
-		"KillMonsterNum",
-		NULL);
-
 	//订阅切换失败场景
 	NOTIFY->addObserver(this,
 		callfuncO_selector(MainSence::recvGameOver),
 		"GameOver",
 		NULL);
 
-	//订阅切换失败场景
+	////订阅切换失败场景
+	//NOTIFY->addObserver(this,
+	//	callfuncO_selector(MainSence::recvChangeBK),
+	//	"ChangeBK",
+	//	NULL);
+
+	//订阅控制显示增加分数
 	NOTIFY->addObserver(this,
-		callfuncO_selector(MainSence::recvChangeBK),
-		"ChangeBK",
+		callfuncO_selector(MainSence::increNum),
+		"KillMonsterNum",
 		NULL);
 
-	//订阅切换失败场景
+	//订阅控制显示减少分数
 	NOTIFY->addObserver(this,
 		callfuncO_selector(MainSence::deNum),
 		"DeNum",
@@ -126,21 +128,23 @@ bool MainSence::init(int level)
 	return true;
 }
 
+/*每次新增的点数，控制显示去掉新增的点数*/
+void MainSence::increNum(Ref* pData)
+{
+	m_KillMonsterNum += *((int*)pData);
+	m_Label->setString(StringUtils::format("%d", m_KillMonsterNum));
+}
+
+/*每次消耗的点数，控制显示去掉消耗的点数*/
 void MainSence::deNum(Ref* pData)
 {
-	int usedFeeNum = *(int*)pData;
+	int usedFeeNum = *((int*)pData);
 	if ((m_KillMonsterNum - usedFeeNum) < 0)
 	{
 		return;
 	}
 
 	m_KillMonsterNum -= usedFeeNum;
-	m_Label->setString(StringUtils::format("%d", m_KillMonsterNum));
-}
-
-void MainSence::killedMonsterNum(Ref* pData)
-{
-	++m_KillMonsterNum;
 	m_Label->setString(StringUtils::format("%d", m_KillMonsterNum));
 }
 
@@ -153,9 +157,9 @@ void MainSence::recvGameOver(Ref* pData)
 	{
 		auto sp = Sprite::create("bk_boat.png");
 		sp->setAnchorPoint(Vec2(0.0f, 0.0f));
-		auto fadein = FadeIn::create(3);
+		auto fadein = FadeIn::create(3.0f);
 		m_BackGrandLayer->addChild(sp, 2);
-		auto fadeout = FadeOut::create(0.1);
+		auto fadeout = FadeOut::create(3.0f);
 		sp->runAction(Sequence::create(fadeout, fadein, NULL));
 	};
 	auto callback = CallFunc::create(Func);
@@ -166,7 +170,9 @@ void MainSence::recvChangeBK(Ref* pData)
 {
 }
 
+//update 循环函数
 void MainSence::update(float dt)
 {
+	//设置物理环境刷新频率
 	getOriScene()->getPhysicsWorld()->step(0.02f);
 }

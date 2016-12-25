@@ -30,17 +30,17 @@ public:
 
 	void update(float dt);
 
-	//订阅函数GameWin
-	void killedMonsterNum(Ref* pData);
-
 	//订阅函数GameOver
 	void recvGameOver(Ref* pData);
 
 	//订阅函数更换背景
 	void recvChangeBK(Ref* pData);
 
-	//消耗杀敌数
+	//消耗的点数
 	void deNum(Ref* pData);
+
+	//获得的点数
+	void increNum(Ref* pData);
 
 	//杀敌数
 	CC_SYNTHESIZE(int, m_KillMonsterNum, KillMonsterNum);

@@ -13,6 +13,15 @@ Monster::Monster(void)
 	m_startMoveAction = false;
 	m_startFightAciton = false;
 	m_acceptBlood = 1;
+
+	m_iBaseAtk = 1;
+	m_iCurAtk = 1;
+	m_iHP = 1;
+	m_iCurAtk = 1;
+	m_iHP = 1;
+	m_iDefens = 1;
+	m_iSpeed = 1;
+	m_iCurAtkSpeed = 1;
 }
 
 Monster::~Monster(void)
@@ -85,7 +94,7 @@ void Monster::simpleAI(Vec2 pPos)
 	}
 	else
 	{
-		auto jumpBy = JumpBy::create(0.5, Vec2(-20, 100), 10, 1);
+		auto jumpBy = JumpBy::create(0.5, Vec2(-20, 1), 1, 1);
 		this->runAction(jumpBy);
 	}
 }
@@ -99,7 +108,7 @@ void Monster::simpleAI2(Vec2 pPos)
 	}
 	else
 	{
-		auto jumpBy = JumpBy::create(0.5, Vec2(-15, 100), 30, 1);
+		auto jumpBy = JumpBy::create(0.5, Vec2(-15, 1), 1, 1);
 		this->runAction(jumpBy);
 	}
 }

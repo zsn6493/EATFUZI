@@ -49,6 +49,8 @@ public:
 	//游戏逻辑
 	void logic();
 
+	void runPlayerDeadPower(Player* zombie);
+
 	void startPlayerMoveAction();
 
 	void stopPlayerAction();
@@ -61,16 +63,22 @@ public:
 
 	void controlAction(float dt);
 
+	void setZombieColor(int index, Player* zombie);
+
+	BezierTo* bezierAction(Vec2 first, Vec2 last, int radian);
+
+	void initPlayerPic(CharType charType);
+
 	CC_SYNTHESIZE(bool, m_BigPower, BigPowerStatus);
 	CC_SYNTHESIZE(Vector<Player*>*, m_zombiePtr, zombiePtr);
 	CC_SYNTHESIZE(int, m_HurtValue, HurtValue);
+	CC_SYNTHESIZE(Vec2, m_Origin, OriginPoint);
 
 private:
 	Player*                  m_Player;                //冒险家
 	PlayerPower*        m_Power;                 //技能
-	CharType              m_CharType;                       //技能类型
-	Vec2                      m_Origin;                 //玩家初始点
-	std::string               m_FileName;           //创建冒险家的初始图片资源
+	CharType               m_CharType;                       //技能类型
+	std::string              m_FileName;           //创建冒险家的初始图片资源
 	Rect                       m_Rect;                  //图片资源的显示区域
 	Vector<Player*> m_zombieVector;
 	int m_level;

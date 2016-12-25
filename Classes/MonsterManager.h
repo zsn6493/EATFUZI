@@ -41,11 +41,16 @@ public:
 
 	int killPlayer(Vector<Player*>* playerList);
 
-	//下一个地图
-	void nextMap(CCTMXTiledMap* map, int maxLength);
-
 	//初始化monster 物理刚体 临时测试
 	void initPhysicsBody(Monster* monster);
+
+	void MonsterManager::initMonsterProper(Monster* monster,
+		int baseAtk,
+		int curAtk,
+		int hp,
+		int defens,
+		int speed,
+		int curAtkSpeed);
 
 	void callMonsterIntoMap(float dt);
 	void callMonsterIntoMap2(float dt);

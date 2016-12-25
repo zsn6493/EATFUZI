@@ -1,8 +1,8 @@
 /*
-	文件名：Player.h
-	描   述： 游戏主角
-	制作人： 周司南
-	*/
+文件名：Player.h
+描   述： 游戏主角
+制作人： 周司南
+*/
 #ifndef _Player_H_
 #define _Player_H_
 
@@ -10,22 +10,19 @@
 #include "cocos2d.h"
 USING_NS_CC;
 
-class Player : public PSoul
+class Zombie : public PSoul
 {
 public:
-	Player(void);
-	~Player(void);
+	Zombie(void);
+	~Zombie(void);
 
-	//创建player
-	static Player* create(Sprite* sprite);
+	//创建Zombie
+	static Zombie* create(Sprite* sprite);
 
 	//以图片初始化
 	virtual bool init(Sprite* sprite);
 
-	void Player::setSpecialName(std::string battleName);
-
-	//玩家的moveby动作
-	void movePlayer(int flag);
+	void setSpecialName(std::string battleName);
 
 	//初始化物理属性
 	void initPhysicsBody();

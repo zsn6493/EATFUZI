@@ -32,7 +32,6 @@ public:
 
 	void updatCallBack(float);
 
-	CC_SYNTHESIZE(PlayerPower*, m_MonsterPower, Power);
 	CC_SYNTHESIZE(CharType, m_CharType, CharType);
 	CC_SYNTHESIZE(Vec2, m_Orgin, Origin);
 

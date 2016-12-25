@@ -107,6 +107,10 @@ public:
 	Sprite* m_Target;
 
 	Node* m_LongTouchLabel;
+
+	Sprite* m_Roler;
+
+	void SpecialProgress(Node* node);
 private:
 	ShowLayer* m_viewLayer;                	//游戏视图层
 	int m_flag;                                            //移动方向标识
@@ -117,6 +121,7 @@ private:
 	Vec2 m_endPoint;
 	long long m_startTime;
 	int m_LabelCount;
+	int m_MonsterBloodNum;
 };
 
 #endif // ___CONTROLLAYER_H__
