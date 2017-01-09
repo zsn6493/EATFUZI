@@ -49,5 +49,6 @@ private:
 	int DirX;
 	int DirY;
 	bool m_Touch;
+	float delta;
 };
 #endif

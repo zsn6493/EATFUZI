@@ -2,6 +2,8 @@
 #include "PartiscEx.h"
 #include "SimpleAudioEngine.h"
 #include "AnimoTool.h"
+#include "FlowWord.h"
+#include "PowerEnum.h"
 
 USING_NS_CC;
 using namespace CocosDenshion;
@@ -20,6 +22,8 @@ Player::Player(void)
 	m_iDefens = 1;
 	m_iSpeed = 1;
 	m_iCurAtkSpeed = 1;
+	m_iHurtedStatus = false;
+	m_ZombieStatus = MonsterStatus::MoveStatus;
 }
 
 Player::~Player(void)
@@ -134,6 +138,29 @@ void Player::moveZombie(float dt)
 			   break;
 	}
 	}
+}
+
+void Player::fightSpeedZombie(float dt)
+{
+	this->hurtMe(this->gethurtedValue());
+
+	std::string blood = StringUtils::format("%d", this->gethurtedValue());
+	FlowWord* flowWord = FlowWord::create();
+	flowWord->showWord(blood.c_str(), Vec2(this->getSprite()->getPosition().x, this->getSprite()->getPosition().y + this->getContentSize().height / 2));
+	flowWord->gettextLab()->setColor(Color3B(255, 0, 0));
+	this->addChild(flowWord);
+
+	/*auto callbackFunc = [=]()
+	{
+	this->getSprite()->stopActionByTag(101);
+	};
+
+	CallFunc* callFunc = CallFunc::create(callbackFunc);
+	auto action = AnimoTool::newTypeOneAttactAnimotion();
+	action->setTag(101);
+	this->getSprite()->runAction(Sequence::create(action, callFunc, NULL));*/
+
+	m_iHurtedStatus = false;
 }
 
 void Player::updateCallBack(float dt)

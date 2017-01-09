@@ -71,11 +71,11 @@ void BeginLayer::loadConfig()
 
 void BeginLayer::nextSceneCallback(Ref* pSender)
 {
-	auto scene = SelectSence::createScene();
-	Director::getInstance()->replaceScene(TransitionFade::create(2.0f, scene));
-	/*auto scene = MainSence::createScene(3);
+	//auto scene = SelectSence::createScene();
+	//Director::getInstance()->replaceScene(TransitionFade::create(2.0f, scene));
+	auto scene = MainSence::createScene(3);
 	auto layer = scene->getChildByTag(1);
 	MainSence* curlayer = (MainSence*)layer;
 	curlayer->setOriScene(scene);
-	Director::getInstance()->replaceScene(TransitionFade::create(2.0f, scene));*/
+	Director::getInstance()->replaceScene(TransitionFade::create(2.0f, scene));
 }

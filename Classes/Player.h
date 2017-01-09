@@ -8,6 +8,7 @@
 
 #include "Psoul.h"
 #include "cocos2d.h"
+#include "PowerEnum.h"
 USING_NS_CC;
 
 class Player : public PSoul
@@ -32,6 +33,8 @@ public:
 
 	void moveZombie(float dt);
 
+	void fightSpeedZombie(float dt);
+
 	void updateCallBack(float dt);
 
 	CC_SYNTHESIZE(std::string, m_BattleName, BattleName);	//称号
@@ -49,5 +52,9 @@ public:
 
 	CC_SYNTHESIZE(bool, m_startMoveAction, startMoveAction);	//当前行动状态。
 	CC_SYNTHESIZE(bool, m_startFightAciton, startFightAciton);	//当前行动状态。
+
+	CC_SYNTHESIZE(int, m_iHurtedValue, hurtedValue);	//当前行动状态。
+	CC_SYNTHESIZE(bool, m_iHurtedStatus, hurtedStatus);	//当前行动状态。
+	CC_SYNTHESIZE(MonsterStatus, m_ZombieStatus, ZombieStatus);
 };
 #endif

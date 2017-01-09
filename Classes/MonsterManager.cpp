@@ -266,20 +266,13 @@ int MonsterManager::killPlayer(Vector<Player*>* playerList)
 				{
 					monster->setmoveStatus(false);
 
-					//ÉËº¦¼ÆËã
-					int temp = CCRANDOM_0_1() *
-						(player->getiBaseAtk() + player->getiCurAtk() - monster->getiDefens());
-					monster->hurtMe(temp);
-
-					//ÉËº¦Õ¹Ê¾
-					string boold = StringUtils::format("%d", temp);
-					FlowWord* flowWord = FlowWord::create();
-					flowWord->showWord(boold.c_str(),
-						Vec2(monster->getSprite()->getPosition().x,
-						monster->getSprite()->getPosition().y +
-						monster->getContentSize().height / 2));
-					flowWord->gettextLab()->setColor(Color3B(255, 0, 0));
-					monster->addChild(flowWord);
+					if (monster->gethurtedStatus() == false)
+					{
+						monster->sethurtedStatus(true);
+						monster->sethurtedValue(CCRANDOM_0_1() *
+							(player->getiBaseAtk() + player->getiCurAtk() - monster->getiDefens()));
+						monster->scheduleOnce(schedule_selector(Monster::fightSpeedMonster), 1.0f);
+					}
 				}
 				else
 				{

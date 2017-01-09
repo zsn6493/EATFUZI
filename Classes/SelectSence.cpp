@@ -13,9 +13,10 @@ SelectSence::SelectSence()
 	speed = 2;
 	m_Sp = nullptr;
 	m_ColorLayer = nullptr;
+	m_Touch = false;
 	DirX = 0;
 	DirY = 0;
-	m_Touch = false;
+	delta = 0;
 }
 
 SelectSence::~SelectSence()
@@ -72,14 +73,13 @@ void SelectSence::loadConfig()
 	m_menu->setVisible(false);
 	this->addChild(m_menu, 2);
 
-	m_ColorLayer = LayerColor::create(Color4B(128, 128, 128, 100), 5000, 5000);
+	m_ColorLayer = LayerColor::create(Color4B(32, 146, 200, 100), 5000, 5000);
 	m_ColorLayer->setPosition(Vec2(0, 0));
 	m_ColorLayer->setContentSize(Size(5000, 5000));
 	m_ColorLayer->setAnchorPoint(Vec2(0, 0));
 	this->addChild(m_ColorLayer, 1);
 
 	//创建一个空白sprite
-	Size contentSize = m_ColorLayer->getContentSize();
 	m_Sp = Sprite::create(NEWTYPE_ONE, NEWTYPE_ONE_RECT);
 	m_Sp->setPosition(2500, 2500);
 	m_Sp->setAnchorPoint(Vec2(0.5, 0.5));
@@ -108,6 +108,23 @@ void SelectSence::onTouchesBegan(const std::vector<Touch*>& touches, cocos2d::Ev
 
 	for (auto &touch : touches)
 	{
+		float x = touch->getLocation().x - m_ColorLayer->getPositionX() - m_Sp->getPositionX();
+		float y = touch->getLocation().y - m_ColorLayer->getPositionY() - m_Sp->getPositionY();
+		float del = atan(x / y) * 180 / 3.14;
+
+		if (x < 0)
+		{
+			del = 360 + del;
+		}
+
+		if (y < 0)
+		{
+			del = 180 + del;
+		}
+
+		auto roby = RotateBy::create(0.5f, del - delta);
+		m_Sp->runAction(roby);
+		delta = del;
 		//(touch->getLocation().x - m_ColorLayer->getPositionX() - m_Sp->getPositionX() > 0) ? DirX = 1 : DirX = -1;
 		//(touch->getLocation().y - m_ColorLayer->getPositionY() - m_Sp->getPositionY() > 0) ? DirY = 1 : DirY = -1;
 

@@ -49,4 +49,11 @@ enum GodArmType
 	Godt4,
 	Godt5
 };
+
+enum MonsterStatus
+{
+	MoveStatus,
+	FigthStatus,
+	DieStatus
+};
 #endif

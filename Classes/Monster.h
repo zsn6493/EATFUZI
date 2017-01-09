@@ -51,7 +51,12 @@ public:
 	CC_SYNTHESIZE(bool, m_startFightAciton, startFightAciton);	//当前战斗状态。
 	CC_SYNTHESIZE(int, m_acceptBlood, AcceptBlood);	//当前受伤值。
 
+	CC_SYNTHESIZE(int, m_iHurtedValue, hurtedValue);	//当前行动状态。
+	CC_SYNTHESIZE(bool, m_iHurtedStatus, hurtedStatus);	//当前行动状态。
+
 	void updateCallBack(float dt);
+
+	void fightSpeedMonster(float dt);
 
 private:
 	int                          m_Speed;                  //怪物的速度

@@ -75,7 +75,8 @@ void ShowLayer::loadConfig(int level)
 	case 2:
 	case 3:
 	{
-			  int rand = CCRANDOM_0_1() * 5;
+			  //保留
+			  //int rand = CCRANDOM_0_1() * 5;
 
 			  //加载地图资源
 			  m_Map = CCTMXTiledMap::create("LastMap2.tmx");
@@ -115,6 +116,7 @@ void ShowLayer::loadConfig(int level)
 			  float bossPointX = bossPoint.at("x").asFloat();
 			  float bossPointY = bossPoint.at("y").asFloat();
 
+			  //创建BossManager
 			  m_BossManager = BossManager::createWithLevel(Vec2(bossPointX, bossPointY), level);
 			  m_BossManager->setAnchorPoint(Vec2(0, 0));
 			  m_BossManager->setPosition(Vec2(0, 0));
@@ -128,11 +130,12 @@ void ShowLayer::loadConfig(int level)
 			  m_GodArmManager->runPower();
 
 			  this->schedule(schedule_selector(ShowLayer::Monsterlogic), 1 / 20.0f);
-			  this->schedule(schedule_selector(ShowLayer::killPlayerlogic), 0.2f);
-			  this->schedule(schedule_selector(ShowLayer::killMonsterlogic), 0.2f);
+			  this->schedule(schedule_selector(ShowLayer::killPlayerlogic), 0.05f);
+			  this->schedule(schedule_selector(ShowLayer::killMonsterlogic), 0.05f);
 			  this->schedule(schedule_selector(ShowLayer::logic), 1 / 20.0f);
 			  this->schedule(schedule_selector(ShowLayer::Bosslogic), 1.0f);
-			  //认领地图
+
+			  //加载地图
 			  this->addChild(m_Map, 0, 1);
 			  //CCLOG("PlayerManager %2.2f, %2.2f\n", m_PlayerManager->getPosition().x, m_PlayerManager->getPosition().y);
 	}
@@ -201,7 +204,6 @@ Point ShowLayer::setViewPoint()
 	auto viewPoint = centerOfView - actualPosition;
 
 	return viewPoint;
-	//return Vec2(0, 0);
 }
 
 void ShowLayer::useZombie(int level)

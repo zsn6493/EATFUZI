@@ -1,9 +1,12 @@
 #include "Monster.h"
 #include "SimpleAudioEngine.h"
 #include "AnimoTool.h"
+#include "FlowWord.h"
+#include <string>
 
 USING_NS_CC;
 using namespace CocosDenshion;
+using namespace std;
 
 Monster::Monster(void)
 {
@@ -22,6 +25,8 @@ Monster::Monster(void)
 	m_iDefens = 1;
 	m_iSpeed = 1;
 	m_iCurAtkSpeed = 1;
+
+	m_iHurtedStatus = false;
 }
 
 Monster::~Monster(void)
@@ -71,6 +76,23 @@ void Monster::loadConfigure()
 		//this->schedule(schedule_selector(Monster::updateCallBack), 0.05f);
 		break;
 	}
+}
+
+void Monster::fightSpeedMonster(float dt)
+{
+	this->hurtMe(this->gethurtedValue());
+
+	//ÉËº¦Õ¹Ê¾
+	string boold = StringUtils::format("%d", this->gethurtedValue());
+	FlowWord* flowWord = FlowWord::create();
+	flowWord->showWord(boold.c_str(),
+		Vec2(this->getSprite()->getPosition().x,
+		this->getSprite()->getPosition().y +
+		this->getContentSize().height / 2));
+	flowWord->gettextLab()->setColor(Color3B(255, 0, 0));
+	this->addChild(flowWord);
+
+	m_iHurtedStatus = false;
 }
 
 void Monster::updateCallBack(float dt)

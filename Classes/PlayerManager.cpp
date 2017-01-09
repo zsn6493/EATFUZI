@@ -17,6 +17,7 @@ PlayerManager::PlayerManager()
 
 PlayerManager::~PlayerManager()
 {
+	this->unscheduleAllSelectors();
 }
 
 /*创建英雄*/
@@ -63,7 +64,7 @@ bool PlayerManager::init(Vec2 pt, int level)
 	initRandSeed();
 
 	//zombie的移动逻辑控制
-	this->schedule(schedule_selector(PlayerManager::controlAction), 0.2f);
+	this->schedule(schedule_selector(PlayerManager::controlAction), 0.1f);
 
 	return true;
 }
@@ -286,16 +287,24 @@ int PlayerManager::killMonster(Vector<Monster*>* monsterList)
 			if (currentDistance <= contractDistance)
 			{
 				zombie->setmoveStatus(false);
-				//monster->setAcceptBlood(CCRANDOM_0_1() * zombie->getiCurAtk());
-				int temp = (monster->getiBaseAtk() + monster->getiCurAtk() - zombie->getiDefens());
-				zombie->hurtMe(temp);
 
-				std::string blood = StringUtils::format("%d", temp);
-				FlowWord* flowWord = FlowWord::create();
-				flowWord->showWord(blood.c_str(), Vec2(zombie->getSprite()->getPosition().x, zombie->getSprite()->getPosition().y + zombie->getContentSize().height / 2));
-				flowWord->gettextLab()->setColor(Color3B(255, 0, 0));
-				zombie->setmoveStatus(false);
-				zombie->addChild(flowWord);
+				if (zombie->gethurtedStatus() == false)
+				{
+					zombie->sethurtedStatus(true);
+					zombie->sethurtedValue(monster->getiBaseAtk() + monster->getiCurAtk() - zombie->getiDefens());
+					zombie->scheduleOnce(schedule_selector(Player::fightSpeedZombie), 1.0f);
+				}
+
+				//int temp = (monster->getiBaseAtk() + monster->getiCurAtk() - zombie->getiDefens());
+				//zombie->hurtMe(temp);
+
+				//std::string blood = StringUtils::format("%d", temp);
+				//FlowWord* flowWord = FlowWord::create();
+				//flowWord->showWord(blood.c_str(), Vec2(zombie->getSprite()->getPosition().x, zombie->getSprite()->getPosition().y + zombie->getContentSize().height / 2));
+				//flowWord->gettextLab()->setColor(Color3B(255, 0, 0));
+				//zombie->addChild(flowWord);
+
+				//monster->setAcceptBlood(CCRANDOM_0_1() * zombie->getiCurAtk());
 			}
 			else
 			{
@@ -325,6 +334,7 @@ void PlayerManager::controlAction(float dt)
 				zombie->setstartMoveAction(true);
 				zombie->setstartFightAciton(false);
 				zombie->getSprite()->stopActionByTag(101);
+
 				//zombie运动动画
 				auto action = AnimoTool::newTypeOneRightMoveAnimotion();
 				action->setTag(100);
@@ -338,6 +348,7 @@ void PlayerManager::controlAction(float dt)
 				zombie->setstartFightAciton(true);
 				zombie->setstartMoveAction(false);
 				zombie->getSprite()->stopActionByTag(100);
+
 				//zombie运动动画
 				auto action = AnimoTool::newTypeOneAttactAnimotion();
 				action->setTag(101);
@@ -449,6 +460,18 @@ void PlayerManager::logic()
 {
 	for (auto zombie : m_zombieVector)
 	{
+		switch (zombie->getZombieStatus())
+		{
+		case MoveStatus:
+			break;
+		case FigthStatus:
+			break;
+		case DieStatus:
+			break;
+		default:
+			break;
+		}
+
 		auto winSize = Director::getInstance()->getWinSize();
 		if (zombie->getPositionX() > winSize.width)
 		{
