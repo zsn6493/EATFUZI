@@ -131,8 +131,8 @@ void ShowLayer::loadConfig(int level)
 
 			  this->schedule(schedule_selector(ShowLayer::Monsterlogic), 1 / 20.0f);
 			  this->schedule(schedule_selector(ShowLayer::killPlayerlogic), 0.05f);
-			  this->schedule(schedule_selector(ShowLayer::killMonsterlogic), 0.05f);
-			  this->schedule(schedule_selector(ShowLayer::logic), 1 / 20.0f);
+			  this->schedule(schedule_selector(ShowLayer::killMonsterlogic), 0.1f);
+			  this->schedule(schedule_selector(ShowLayer::logic), 0.1f);
 			  this->schedule(schedule_selector(ShowLayer::Bosslogic), 1.0f);
 
 			  //加载地图
@@ -260,7 +260,7 @@ void ShowLayer::jumpPlayer()
 /*调用showLayer的逻辑*/
 void ShowLayer::logic(float dt)
 {
-	m_PlayerManager->logic();
+	m_PlayerManager->logic(dt);
 }
 
 void ShowLayer::Bosslogic(float dt)
@@ -275,7 +275,7 @@ void ShowLayer::Bosslogic(float dt)
 
 void ShowLayer::Monsterlogic(float dt)
 {
-	m_MonsterManager->logic();
+	m_MonsterManager->logic(dt);
 }
 
 void ShowLayer::killPlayerlogic(float dt)

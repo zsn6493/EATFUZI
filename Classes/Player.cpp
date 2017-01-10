@@ -24,6 +24,7 @@ Player::Player(void)
 	m_iCurAtkSpeed = 1;
 	m_iHurtedStatus = false;
 	m_ZombieStatus = MonsterStatus::MoveStatus;
+	m_DeltaTime = 0.0f;
 }
 
 Player::~Player(void)
@@ -131,6 +132,11 @@ void Player::moveZombie(float dt)
 	}
 	default:
 	{
+			   //zombieÔË¶¯¶¯»­
+			   /*	   auto action = AnimoTool::newTypeOneRightMoveAnimotion();
+					  action->setTag(100);
+					  this->getSprite()->runAction(action);*/
+
 			   //auto jb = JumpBy::create(0.7, Vec2(2, 10), 5, 1);
 			   auto mb = MoveBy::create(0.5, Vec3(15, 0, 0));
 			   mb->setTag(5);
@@ -142,13 +148,21 @@ void Player::moveZombie(float dt)
 
 void Player::fightSpeedZombie(float dt)
 {
-	this->hurtMe(this->gethurtedValue());
+	m_DeltaTime += dt;
 
-	std::string blood = StringUtils::format("%d", this->gethurtedValue());
-	FlowWord* flowWord = FlowWord::create();
-	flowWord->showWord(blood.c_str(), Vec2(this->getSprite()->getPosition().x, this->getSprite()->getPosition().y + this->getContentSize().height / 2));
-	flowWord->gettextLab()->setColor(Color3B(255, 0, 0));
-	this->addChild(flowWord);
+	if (m_DeltaTime >= 3.0f)
+	{
+		this->hurtMe(this->gethurtedValue());
+
+		std::string blood = StringUtils::format("%d", this->gethurtedValue());
+		FlowWord* flowWord = FlowWord::create();
+		flowWord->showWord(blood.c_str(), Vec2(this->getSprite()->getPosition().x, this->getSprite()->getPosition().y + this->getContentSize().height / 2));
+		flowWord->gettextLab()->setColor(Color3B(255, 0, 0));
+		this->addChild(flowWord);
+
+		m_iHurtedStatus = false;
+		m_DeltaTime = 0.0f;
+	}
 
 	/*auto callbackFunc = [=]()
 	{
@@ -159,10 +173,22 @@ void Player::fightSpeedZombie(float dt)
 	auto action = AnimoTool::newTypeOneAttactAnimotion();
 	action->setTag(101);
 	this->getSprite()->runAction(Sequence::create(action, callFunc, NULL));*/
-
-	m_iHurtedStatus = false;
 }
 
 void Player::updateCallBack(float dt)
 {
+	switch (getZombieStatus())
+	{
+	case MoveStatus:
+		moveZombie(dt);
+		break;
+	case FigthStatus:
+		this->stopAllActions();
+		fightSpeedZombie(dt);
+		break;
+	case DieStatus:
+		break;
+	default:
+		break;
+	}
 }

@@ -64,7 +64,7 @@ bool PlayerManager::init(Vec2 pt, int level)
 	initRandSeed();
 
 	//zombie的移动逻辑控制
-	this->schedule(schedule_selector(PlayerManager::controlAction), 0.1f);
+	//this->schedule(schedule_selector(PlayerManager::controlAction), 0.1f);
 
 	return true;
 }
@@ -286,14 +286,16 @@ int PlayerManager::killMonster(Vector<Monster*>* monsterList)
 
 			if (currentDistance <= contractDistance)
 			{
-				zombie->setmoveStatus(false);
+				//zombie->setmoveStatus(false);
 
-				if (zombie->gethurtedStatus() == false)
-				{
-					zombie->sethurtedStatus(true);
-					zombie->sethurtedValue(monster->getiBaseAtk() + monster->getiCurAtk() - zombie->getiDefens());
-					zombie->scheduleOnce(schedule_selector(Player::fightSpeedZombie), 1.0f);
-				}
+				zombie->setZombieStatus(MonsterStatus::FigthStatus);
+
+				//if (zombie->gethurtedStatus() == false)
+				//{
+				//zombie->sethurtedStatus(true);
+				zombie->sethurtedValue(monster->getiBaseAtk() + monster->getiCurAtk() - zombie->getiDefens());
+				//zombie->scheduleOnce(schedule_selector(Player::fightSpeedZombie), 1.0f);
+				//}
 
 				//int temp = (monster->getiBaseAtk() + monster->getiCurAtk() - zombie->getiDefens());
 				//zombie->hurtMe(temp);
@@ -308,7 +310,8 @@ int PlayerManager::killMonster(Vector<Monster*>* monsterList)
 			}
 			else
 			{
-				zombie->setmoveStatus(true);
+				zombie->setZombieStatus(MonsterStatus::MoveStatus);
+				//zombie->setmoveStatus(true);
 			}
 		}
 
@@ -325,36 +328,37 @@ void PlayerManager::controlAction(float dt)
 {
 	for (auto zombie : m_zombieVector)
 	{
-		if (zombie->getmoveStatus())
-		{
-			zombie->scheduleOnce(schedule_selector(Player::moveZombie), 0.1f);
+		//if (zombie->getZombieStatus() == MonsterStatus::)
+		//if (zombie->getmoveStatus())
+		//{
+		//	zombie->scheduleOnce(schedule_selector(Player::moveZombie), 0.1f);
 
-			if (zombie->getstartMoveAction() == false)
-			{
-				zombie->setstartMoveAction(true);
-				zombie->setstartFightAciton(false);
-				zombie->getSprite()->stopActionByTag(101);
+		//	if (zombie->getstartMoveAction() == false)
+		//	{
+		//		zombie->setstartMoveAction(true);
+		//		zombie->setstartFightAciton(false);
+		//		zombie->getSprite()->stopActionByTag(101);
 
-				//zombie运动动画
-				auto action = AnimoTool::newTypeOneRightMoveAnimotion();
-				action->setTag(100);
-				zombie->getSprite()->runAction(action);
-			}
-		}
-		else
-		{
-			if (zombie->getstartFightAciton() == false)
-			{
-				zombie->setstartFightAciton(true);
-				zombie->setstartMoveAction(false);
-				zombie->getSprite()->stopActionByTag(100);
+		//		//zombie运动动画
+		//		auto action = AnimoTool::newTypeOneRightMoveAnimotion();
+		//		action->setTag(100);
+		//		zombie->getSprite()->runAction(action);
+		//	}
+		//}
+		//else
+		//{
+		//	if (zombie->getstartFightAciton() == false)
+		//	{
+		//		zombie->setstartFightAciton(true);
+		//		zombie->setstartMoveAction(false);
+		//		zombie->getSprite()->stopActionByTag(100);
 
-				//zombie运动动画
-				auto action = AnimoTool::newTypeOneAttactAnimotion();
-				action->setTag(101);
-				zombie->getSprite()->runAction(action);
-			}
-		}
+		//		//zombie运动动画
+		//		auto action = AnimoTool::newTypeOneAttactAnimotion();
+		//		action->setTag(101);
+		//		zombie->getSprite()->runAction(action);
+		//	}
+		//}
 	}
 }
 
@@ -456,21 +460,11 @@ void PlayerManager::runPlayerDeadPower(Player* zombie)
 }
 
 /*zombie死亡释放处理*/
-void PlayerManager::logic()
+void PlayerManager::logic(float dt)
 {
 	for (auto zombie : m_zombieVector)
 	{
-		switch (zombie->getZombieStatus())
-		{
-		case MoveStatus:
-			break;
-		case FigthStatus:
-			break;
-		case DieStatus:
-			break;
-		default:
-			break;
-		}
+		zombie->updateCallBack(dt);
 
 		auto winSize = Director::getInstance()->getWinSize();
 		if (zombie->getPositionX() > winSize.width)

@@ -47,7 +47,7 @@ public:
 	int killMonster(Vector<Monster*>* monsterList);
 
 	//ÓÎÏ·Âß¼­
-	void logic();
+	void logic(float dt);
 
 	void runPlayerDeadPower(Player* zombie);
 

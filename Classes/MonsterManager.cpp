@@ -82,7 +82,7 @@ bool MonsterManager::init(ValueVector monsterPoints, int level)
 
 			  this->schedule(schedule_selector(MonsterManager::callMonsterIntoMap2), 5.0f);
 
-			  this->schedule(schedule_selector(MonsterManager::controlAction), 0.1f);
+			  //this->schedule(schedule_selector(MonsterManager::controlAction), 0.1f);
 			  break;
 	}
 	case 4:
@@ -92,7 +92,7 @@ bool MonsterManager::init(ValueVector monsterPoints, int level)
 
 			  this->schedule(schedule_selector(MonsterManager::callMonsterIntoMap), 5.0f);
 
-			  this->schedule(schedule_selector(MonsterManager::controlAction), 0.1f);
+			  //this->schedule(schedule_selector(MonsterManager::controlAction), 0.1f);
 			  break;
 	}
 	default:
@@ -264,19 +264,21 @@ int MonsterManager::killPlayer(Vector<Player*>* playerList)
 
 				if (currentDistance < constractDistance)
 				{
-					monster->setmoveStatus(false);
+					monster->setMStatus(MonsterStatus::FigthStatus);
+					monster->sethurtedValue(CCRANDOM_0_1() * (player->getiBaseAtk() + player->getiCurAtk() - monster->getiDefens()));
+					//monster->setmoveStatus(false);
 
-					if (monster->gethurtedStatus() == false)
-					{
-						monster->sethurtedStatus(true);
-						monster->sethurtedValue(CCRANDOM_0_1() *
-							(player->getiBaseAtk() + player->getiCurAtk() - monster->getiDefens()));
-						monster->scheduleOnce(schedule_selector(Monster::fightSpeedMonster), 1.0f);
-					}
+					////if (monster->gethurtedStatus() == false)
+					//{
+					//	//monster->sethurtedStatus(true);
+					//	//
+					//	monster->scheduleOnce(schedule_selector(Monster::fightSpeedMonster), 1.0f);
+					//}
 				}
 				else
 				{
-					monster->setmoveStatus(true);
+					monster->setMStatus(MonsterStatus::MoveStatus);
+					//monster->setmoveStatus(true);
 				}
 			}
 		}
@@ -295,31 +297,33 @@ void MonsterManager::controlAction(float dt)
 {
 	for (auto monster : m_monsterList)
 	{
-		if (monster->getmoveStatus())
-		{
-			monster->scheduleOnce(schedule_selector(Monster::updateCallBack), 0.1f);
-			if (monster->getstartMoveAction() == false)
-			{
-				monster->setstartMoveAction(true);
-				monster->setstartFightAciton(false);
-			}
-		}
-		else
-		{
-			if (monster->getstartFightAciton() == false)
-			{
-				monster->setstartFightAciton(true);
-				monster->setstartMoveAction(false);
-			}
-		}
+		//if (monster->getmoveStatus())
+		//{
+		//	monster->scheduleOnce(schedule_selector(Monster::updateCallBack), 0.1f);
+		//	if (monster->getstartMoveAction() == false)
+		//	{
+		//		monster->setstartMoveAction(true);
+		//		monster->setstartFightAciton(false);
+		//	}
+		//}
+		//else
+		//{
+		//	if (monster->getstartFightAciton() == false)
+		//	{
+		//		monster->setstartFightAciton(true);
+		//		monster->setstartMoveAction(false);
+		//	}
+		//}
 	}
 }
 
 /*Âß¼­*/
-void MonsterManager::logic()
+void MonsterManager::logic(float dt)
 {
 	for (auto monster : m_monsterList)
 	{
+		monster->updateCallBack(dt);
+
 		if (monster->isDead())
 		{
 			int charType = monster->getCharType();

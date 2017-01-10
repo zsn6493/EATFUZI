@@ -27,6 +27,9 @@ Monster::Monster(void)
 	m_iCurAtkSpeed = 1;
 
 	m_iHurtedStatus = false;
+
+	m_MStatus = MonsterStatus::MoveStatus;
+	m_DeltaTime = 0.0f;
 }
 
 Monster::~Monster(void)
@@ -97,13 +100,28 @@ void Monster::fightSpeedMonster(float dt)
 
 void Monster::updateCallBack(float dt)
 {
-	if (m_CharType == CharType::t1)
+	switch (getMStatus())
 	{
-		simpleAI(Vec2(0, 0));
+	case MoveStatus:
+	{
+					   if (m_CharType == CharType::t1)
+					   {
+						   simpleAI(Vec2(0, 0));
+					   }
+					   else if (m_CharType == CharType::t2)
+					   {
+						   simpleAI2(Vec2(0, 0));
+					   }
+					   break;
 	}
-	else if (m_CharType == CharType::t2)
-	{
-		simpleAI2(Vec2(0, 0));
+	case FigthStatus:
+		this->stopAllActions();
+		fightSpeedMonster(dt);
+		break;
+	case DieStatus:
+		break;
+	default:
+		break;
 	}
 }
 
@@ -116,7 +134,7 @@ void Monster::simpleAI(Vec2 pPos)
 	}
 	else
 	{
-		auto jumpBy = JumpBy::create(0.5, Vec2(-20, 1), 1, 1);
+		auto jumpBy = JumpBy::create(0.5, Vec2(-10, 1), 1, 1);
 		this->runAction(jumpBy);
 	}
 }
@@ -130,7 +148,7 @@ void Monster::simpleAI2(Vec2 pPos)
 	}
 	else
 	{
-		auto jumpBy = JumpBy::create(0.5, Vec2(-15, 1), 1, 1);
+		auto jumpBy = JumpBy::create(0.5, Vec2(-5, 1), 1, 1);
 		this->runAction(jumpBy);
 	}
 }
@@ -139,23 +157,6 @@ bool Monster::ContainMonsterPower(Player* player)
 {
 	if (m_CharType == t1)
 	{
-		/*
-		Rect rect = player->boundingBox();
-		Rect mrect = m_MonsterPower->boundingBox();
-
-		if (m_MonsterPower->m_visiable)
-		{
-		if (rect.containsPoint(m_MonsterPower->getPosition())
-		|| mrect.containsPoint(player->getPosition()))
-		{
-		auto jumpby = JumpBy::create(0.5, Vec2(-50, 50), 25, 1);
-		player->runAction(Sequence::create(jumpby, NULL));
-		player->getPhysicsBody()->resetForces();
-		}
-		else
-		{
-		}
-		}*/
 	}
 
 	return 0;

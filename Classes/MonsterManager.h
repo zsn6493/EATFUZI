@@ -25,7 +25,7 @@ public:
 	bool init(ValueVector monsterPoints, int level);
 
 	//Âß¼­º¯Êý
-	void logic();
+	void logic(float dt);
 
 	//±£´æplayer
 	Vector<Monster*>* getMonsterList();
